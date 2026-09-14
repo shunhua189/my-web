@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>限时活动 · 信息提取练习</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #edf5fc;
+    color: #193550;
+    font-family: "Microsoft YaHei", "Noto Sans JP", sans-serif;
+    line-height: 1.65;
+  }
+
+  main {
+    max-width: 1060px;
+    margin: auto;
+    padding: 24px 20px 50px;
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 23px;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 30px;
+    background: #e0effc;
+    color: #276296;
+    font-size: 14px;
+    font-weight: normal;
+  }
+
+  /* 文字公告 */
+  .announcement {
+    margin-bottom: 20px;
+    padding: 24px 28px;
+    border: 1px solid #dce8f2;
+    border-top: 4px solid #1768a5;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 6px 20px #16395908;
+  }
+
+  .announcement-label {
+    margin-bottom: 8px;
+    color: #58738a;
+    font-size: 14px;
+  }
+
+  .announcement h2 {
+    margin: 0 0 14px;
+    color: #164f7c;
+    font-size: 23px;
+  }
+
+  .announcement p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.95;
+  }
+
+  /* 信息卡 */
+  .card {
+    padding: 24px;
+    border: 1px solid #dce8f2;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 6px 20px #16395908;
+  }
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 21px;
+  }
+
+  .hint {
+    margin: 0 0 18px;
+    color: #63788b;
+    font-size: 15px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  th {
+    padding: 10px 14px;
+    background: #164f7c;
+    color: white;
+    font-size: 17px;
+    text-align: left;
+  }
+
+  th:first-child {
+    width: 34%;
+  }
+
+  td {
+    padding: 8px 12px;
+    border: 1px solid #dce6ef;
+    vertical-align: middle;
+  }
+
+  td:first-child {
+    background: #f8fbfe;
+    font-size: 16px;
+  }
+
+  input,
+  textarea {
+    display: block;
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid #c9d9e7;
+    border-radius: 6px;
+    background: white;
+    color: #193550;
+    font: inherit;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  input {
+    height: 40px;
+  }
+
+  textarea {
+    height: 64px;
+    min-height: 64px;
+    resize: vertical;
+  }
+
+  input:focus,
+  textarea:focus {
+    outline: 3px solid #bfdef8;
+    border-color: #3489c8;
+  }
+
+  button {
+    border: 0;
+    border-radius: 9px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+  }
+
+  button:focus-visible {
+    outline: 3px solid #60a8df;
+    outline-offset: 3px;
+  }
+
+  .submit {
+    display: block;
+    min-width: 250px;
+    margin: 22px auto 0;
+    padding: 12px 24px;
+    background: #1768a5;
+    color: white;
+    box-shadow: 0 5px 15px #1768a526;
+  }
+
+  .submit:hover {
+    background: #125486;
+  }
+
+  #status {
+    min-height: 24px;
+    margin: 10px 0 0;
+    color: #486e91;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* 诊断结果 */
+  [hidden] {
+    display: none !important;
+  }
+
+  #result {
+    margin-top: 20px;
+  }
+
+  .result-head {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid #e4edf4;
+  }
+
+  .score {
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 108px;
+    height: 108px;
+    border: 6px solid #c1e0f7;
+    border-radius: 50%;
+    background: #eaf5ff;
+    color: #1768a5;
+  }
+
+  .score strong {
+    font-size: 37px;
+    line-height: 1.2;
+  }
+
+  .score span {
+    font-size: 14px;
+  }
+
+  #summary {
+    margin: 8px 0 0;
+    font-size: 16px;
+  }
+
+  .diagnosis {
+    margin-top: 12px;
+    padding: 14px 16px;
+    border: 1px solid #dce8f0;
+    border-left: 4px solid #2c9b80;
+    border-radius: 8px;
+  }
+
+  .diagnosis.review {
+    border-left-color: #d59b32;
+  }
+
+  .item-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-weight: 600;
+  }
+
+  .item-title span {
+    flex-shrink: 0;
+    color: #397258;
+    font-size: 14px;
+  }
+
+  .review .item-title span {
+    color: #8f641d;
+  }
+
+  .diagnosis p {
+    margin: 7px 0 0;
+    font-size: 15px;
+  }
+
+  .reference {
+    color: #58738a;
+  }
+
+  .secondary {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #eaf2fa;
+    color: #195c91;
+  }
+
+  .secondary:hover {
+    background: #dcebf8;
+  }
+
+  .note {
+    margin: 18px 0 0;
+    color: #667b8d;
+    font-size: 14px;
+  }
+
+  @media (max-width: 640px) {
+    main {
+      padding: 16px 10px 36px;
+    }
+
+    .top {
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 20px;
+    }
+
+    .announcement {
+      padding: 18px 16px;
+    }
+
+    .announcement h2 {
+      font-size: 20px;
+    }
+
+    .announcement p {
+      font-size: 16px;
+      line-height: 1.85;
+    }
+
+    .card {
+      padding: 18px 12px;
+    }
+
+    th {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    th:first-child {
+      width: 36%;
+    }
+
+    td {
+      padding: 7px;
+    }
+
+    td:first-child {
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    input,
+    textarea {
+      padding: 7px 8px;
+      font-size: 16px;
+    }
+
+    .submit {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .result-head {
+      gap: 14px;
+    }
+
+    .score {
+      width: 86px;
+      height: 86px;
+    }
+
+    .score strong {
+      font-size: 29px;
+    }
+
+    #resultTitle {
+      font-size: 19px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+
+<body>
+<main>
+  <header class="top">
+    <h1>限时活动 · 信息提取练习</h1>
+    <span class="tag" lang="ja">活動情報カード</span>
+  </header>
+
+  <!-- 活动公告 -->
+  <section class="announcement" aria-label="活动公告" lang="ja">
+    <div class="announcement-label">
+      期間限定イベントのお知らせ
+    </div>
+
+    <h2>イベント名：楽しい夏を！</h2>
+
+    <p>「楽しい夏を！」イベントは、2026年7月15日12:00から7月28日午後4時まで開催されます。冒険ランク1以上の旅人が参加でき、報酬として原石を獲得できます。ゲーム内報酬はメールにて配布され、メールの有効期限は30日間ですので、お早めにお受け取りください。</p>
+  </section>
+
+  <!-- 学生填写 -->
+  <section class="card" aria-labelledby="formTitle">
+    <h2 id="formTitle">阅读公告，填写活动信息卡</h2>
+    <p class="hint">
+      请依据公告填写，注意日期、时间和条件。支持日语或中文作答。
+    </p>
+
+    <form id="answerForm">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col" lang="ja">項目</th>
+            <th scope="col" lang="ja">内容</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>
+              <label for="event" lang="ja">イベント名</label>
+            </td>
+            <td>
+              <input
+                id="event"
+                name="event"
+                type="text"
+                maxlength="200"
+                required
+                autocomplete="off"
+                aria-label="活动名称">
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <label for="start" lang="ja">開始日時</label>
+            </td>
+            <td>
+              <input
+                id="start"
+                name="start"
+                type="text"
+                maxlength="200"
+                required
+                autocomplete="off"
+                aria-label="开始时间">
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <label for="end" lang="ja">終了日時</label>
+            </td>
+            <td>
+              <input
+                id="end"
+                name="end"
+                type="text"
+                maxlength="200"
+                required
+                autocomplete="off"
+                aria-label="结束时间">
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <label for="condition" lang="ja">参加条件</label>
+            </td>
+            <td>
+              <input
+                id="condition"
+                name="condition"
+                type="text"
+                maxlength="200"
+                required
+                autocomplete="off"
+                aria-label="参加条件">
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <label for="reward" lang="ja">報酬内容</label>
+            </td>
+            <td>
+              <input
+                id="reward"
+                name="reward"
+                type="text"
+                maxlength="200"
+                required
+                autocomplete="off"
+                aria-label="奖励内容">
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <label for="notice" lang="ja">
+                注意事項<br>
+                （受取方法・メールの有効期限）
+              </label>
+            </td>
+            <td>
+              <textarea
+                id="notice"
+                name="notice"
+                rows="2"
+                maxlength="500"
+                required
+                aria-label="领取方式与邮件有效期限"></textarea>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <button class="submit" id="submitBtn" type="submit">
+        提交 · 查看AI诊断
+      </button>
+
+      <p id="status" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <!-- 诊断结果 -->
+  <section
+    id="result"
+    class="card"
+    hidden
+    aria-labelledby="resultTitle">
+
+    <div class="result-head">
+      <div class="score">
+        <strong id="scoreValue">0</strong>
+        <span>总分 / 100</span>
+      </div>
+
+      <div>
+        <h2 id="resultTitle">
+          AI诊断
+          <span class="tag">规则模拟</span>
+        </h2>
+        <p id="summary"></p>
+      </div>
+    </div>
+
+    <div id="details"></div>
+
+    <p class="note">
+      采用鼓励性评分，兼容常见日期格式及同义表达，轻微遗漏少扣分。
+      当前为本地规则模拟，未连接AI服务；复杂表述请由教师复核。
+      答案仅在当前页面处理，不会发送或保存到教师后台。
+    </p>
+
+    <button class="secondary" type="button" id="editBtn">
+      返回修改，再次提交
+    </button>
+  </section>
+</main>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+const ids = [
+  "event",
+  "start",
+  "end",
+  "condition",
+  "reward",
+  "notice"
+];
+
+const labels = [
+  "イベント名",
+  "開始日時",
+  "終了日時",
+  "参加条件",
+  "報酬内容",
+  "注意事項"
+];
+
+const references = [
+  "楽しい夏を！",
+  "2026年7月15日12:00",
+  "2026年7月28日午後4時（16:00）",
+  "冒険ランク1以上，即冒险等级1及以上，包括等级1。",
+  "原石",
+  "通过游戏内邮件发放；邮件有效期限为30天，请及时领取。"
+];
+
+let lastResults = [];
+
+/* 兼容全角数字、空格与常见中日文字符 */
+function normalize(text) {
+  return text
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/點/g, "点")
+    .replace(/時/g, "时")
+    .replace(/級/g, "级")
+    .replace(/郵件/g, "邮件")
+    .replace(/郵箱/g, "邮箱");
+}
+
+function scrollToElement(element) {
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
+
+  element.scrollIntoView({
+    behavior: reduceMotion ? "auto" : "smooth",
+    block: "start"
+  });
+}
+
+/* 检查日期和时间 */
+function dateCheck(text, expectedDay, isEnd) {
+  const t = normalize(text);
+
+  const datePattern = new RegExp(
+    "(?:^|[^0-9])0?7(?:月|[/.\\-])0?" +
+    expectedDay +
+    "(?![0-9])(?:日|号)?"
+  );
+
+  const dateOK = datePattern.test(t);
+  const years = t.match(/20\d{2}/g) || [];
+  const yearOK = years.every(year => year === "2026");
+
+  let timeOK = false;
+  let explicitWrongTime = false;
+
+  if (isEnd) {
+    const time24 = /(?:^|[^\d])16(?::00(?!\d)|(?:时|点)(?!\d))/.test(t);
+    const afternoon = /(?:午後|下午)0?4(?::00(?!\d)|(?:时|点)(?!\d))/.test(t);
+    const pm = /(?:^|[^\d])0?4(?::00)?p\.?m\.?/.test(t);
+
+    timeOK = time24 || afternoon || pm;
+
+    if (/(?:午前|上午|凌晨)/.test(t)) {
+      timeOK = false;
+      explicitWrongTime = true;
+    }
+  } else {
+    timeOK = /(?:^|[^\d])12(?::00(?!\d)|(?:时|点)(?!\d))/.test(t);
+
+    if (/(?:深夜|凌晨|午夜|夜中|午前12|12(?::00)?a\.?m)/.test(t)) {
+      timeOK = false;
+      explicitWrongTime = true;
+    }
+  }
+
+  /* 非零分钟属于具体时刻错误 */
+  const clockMatches = [
+    ...t.matchAll(/(\d{1,2})(?::|时|点)(\d{1,2})(?:分)?/g)
+  ];
+
+  if (clockMatches.some(match => Number(match[2]) !== 0)) {
+    timeOK = false;
+    explicitWrongTime = true;
+  }
+
+  if (dateOK && timeOK && yearOK) {
+    return {
+      score: 100,
+      message: "日期与具体时间提取准确，表达清楚。"
+    };
+  }
+
+  if (dateOK && timeOK && !yearOK) {
+    return {
+      score: 88,
+      message: "月日与时刻正确，请核对年份，应为2026年。"
+    };
+  }
+
+  if (dateOK) {
+    return {
+      score: explicitWrongTime ? 75 : 85,
+      message: isEnd
+        ? "结束日期已找对，请核对具体时刻，完整写出“午後4時”或“16:00”。"
+        : "开始日期已找对，请补充或核对“12:00”，即中午12点。"
+    };
+  }
+
+  if (timeOK) {
+    return {
+      score: 65,
+      message: "已识别到正确时刻，请继续核对对应的活动日期。"
+    };
+  }
+
+  return {
+    score: 25,
+    message: "已完成填写，请回到公告的活动时间句，重新核对日期和时刻。"
+  };
+}
+
+/* 逐项诊断 */
+function evaluate(values) {
+  const t = values.map(normalize);
+  const results = [];
+
+  /* 1. 活动名称 */
+  const fullName = t[0].includes("楽しい夏を");
+  const partialName = t[0].includes("楽しい夏");
+
+  results.push({
+    score: fullName ? 100 : partialName ? 92 : 25,
+    message: fullName
+      ? "活动名称准确，标点差异不扣分。"
+      : partialName
+        ? "名称主体已经找对，请补全“を”。"
+        : "请核对标题中的活动名称，并保留活动原名。"
+  });
+
+  /* 2、3. 开始和结束时间 */
+  results.push(dateCheck(values[1], 15, false));
+  results.push(dateCheck(values[2], 28, true));
+
+  /* 4. 参加条件 */
+  const condition = t[3];
+
+  const levelOne = /(?:^|[^\d])1(?!\d)/.test(condition);
+
+  const inclusive =
+    /1(?:级)?以上|(?:≥|>=)1|(?:不低于|至少|大于等于)1|1(?:级)?(?:及以上|或以上)/.test(condition);
+
+  const contradiction =
+    /高于1|超过1|大于1(?!等于)|不包括1|不含1|1(?:级)?(?:不能|不可)|1より上|1を超|1は参加できません|1は参加できない|1を含まない/.test(condition);
+
+  results.push({
+    score: contradiction
+      ? 45
+      : inclusive
+        ? 100
+        : levelOne
+          ? 88
+          : 25,
+
+    message: contradiction
+      ? "“1以上”包括等级1，请修正排除等级1的表述。"
+      : inclusive
+        ? "准确提取等级门槛，并保留了“包括1”的范围。"
+        : levelOne
+          ? "已经找到等级1，请补充“以上”，明确参加范围。"
+          : "请核对参加条件，应为冒险等级1及以上。"
+  });
+
+  /* 5. 奖励内容 */
+  const rewardOK = /原石|primogem/.test(t[4]);
+  const inventedAmount = /\d|百|千|万/.test(t[4]);
+  const rewardNegated =
+    /没有原石|不是原石|無原石|原石ではない|原石はもらえない|原石を獲得できない/.test(t[4]);
+
+  results.push({
+    score: rewardNegated
+      ? 25
+      : rewardOK
+        ? inventedAmount ? 85 : 100
+        : 25,
+
+    message: rewardNegated
+      ? "公告明确写明奖励为原石，请核对并修正否定表述。"
+      : rewardOK
+        ? inventedAmount
+          ? "奖励种类正确，但公告未写明数量，请不要自行补充。"
+          : "奖励内容准确，没有添加公告以外的信息。"
+        : "请查看公告中的“報酬として”，核对奖励种类。"
+  });
+
+  /* 6. 领取方式与邮件期限 */
+  const notice = t[5];
+
+  const mail =
+    /メール|邮件|邮箱|mail/.test(notice);
+
+  const thirtyDays =
+    /(?:30|三十)(?:日間|日|天)/.test(notice);
+
+  const wrongPeriod =
+    /活动(?:持续|时间|期限)(?:为|是)?30|イベント(?:の)?(?:期間|開催期間)(?:は)?30/.test(notice);
+
+  const mailNegated =
+    /不(?:是|通过|用)(?:游戏内)?邮件|メールでは(?:ない|ありません)|メールで受け取れない/.test(notice);
+
+  results.push({
+    score: wrongPeriod || mailNegated
+      ? 60
+      : mail && thirtyDays
+        ? 100
+        : mail || thirtyDays
+          ? 85
+          : 25,
+
+    message: wrongPeriod
+      ? "请区分活动时间和邮件期限：30天指邮件有效期限。"
+      : mailNegated
+        ? "公告说明奖励通过游戏内邮件发放，请核对领取方式。"
+        : mail && thirtyDays
+          ? "领取方式和邮件期限均已提取，关键信息完整。"
+          : mail
+            ? "领取方式已找对，请补充邮件有效期限为30天。"
+            : thirtyDays
+              ? "已找到30天，请说明这是邮件有效期限，并补充游戏内邮件领取方式。"
+              : "请补充领取方式与邮件有效期限这两项信息。"
+  });
+
+  return results;
+}
+
+/* 显示诊断 */
+function renderResults(results) {
+  lastResults = results;
+
+  const score = Math.round(
+    results.reduce((sum, item) => sum + item.score, 0) / results.length
+  );
+
+  $("scoreValue").textContent = score;
+
+  if (score >= 95) {
+    $("summary").textContent =
+      "完成得很好！关键规则提取准确，可以进入口头咨询练习。";
+  } else if (score >= 85) {
+    $("summary").textContent =
+      "整体掌握得不错！再核对下面几处细节，信息就更完整了。";
+  } else if (score >= 60) {
+    $("summary").textContent =
+      "已找到部分关键信息。请根据提示修改，再次提交。";
+  } else {
+    $("summary").textContent =
+      "已完成首次尝试。请结合提示重新阅读公告，逐项核对。";
+  }
+
+  $("details").replaceChildren();
+
+  results.forEach((item, index) => {
+    const box = document.createElement("div");
+    box.className =
+      "diagnosis" + (item.score < 100 ? " review" : "");
+
+    const heading = document.createElement("div");
+    heading.className = "item-title";
+
+    const title = document.createElement("strong");
+    title.textContent = labels[index];
+
+    const badge = document.createElement("span");
+    badge.textContent =
+      item.score === 100 ? "准确" : "建议核对";
+
+    heading.append(title, badge);
+
+    const feedback = document.createElement("p");
+    feedback.textContent = item.message;
+
+    box.append(heading, feedback);
+
+    if (item.score < 100) {
+      const reference = document.createElement("p");
+      reference.className = "reference";
+      reference.textContent = "参考信息：" + references[index];
+      box.append(reference);
+    }
+
+    $("details").append(box);
+  });
+
+  $("result").hidden = false;
+  scrollToElement($("result"));
+}
+
+/* 提交 */
+$("answerForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const values = ids.map(id => $(id).value.trim());
+
+  const blankIndex = values.findIndex(value => !value);
+
+  if (blankIndex !== -1) {
+    $(ids[blankIndex]).focus();
+    $("status").textContent =
+      "请先完成所有项目，空格不算有效填写。";
+    return;
+  }
+
+  const results = evaluate(values);
+  renderResults(results);
+
+  $("status").textContent = "本次诊断已完成。";
+  $("submitBtn").textContent = "再次提交 · 更新诊断";
+});
+
+/* 修改后隐藏旧结果，避免旧分数与新答案混淆 */
+ids.forEach(id => {
+  $(id).addEventListener("input", function() {
+    if (!$("result").hidden) {
+      $("result").hidden = true;
+      $("status").textContent =
+        "答案已修改，请重新提交以更新诊断。";
+    }
+  });
+});
+
+/* 返回首个需要核对的回答框 */
+$("editBtn").addEventListener("click", function() {
+  const firstReview = lastResults.findIndex(
+    item => item.score < 100
+  );
+
+  const targetId = ids[firstReview === -1 ? 0 : firstReview];
+
+  scrollToElement($("answerForm"));
+  $(targetId).focus({ preventScroll: true });
+});
+</script>
+</body>
+</html>
