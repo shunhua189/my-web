@@ -3,14 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>プレイヤー質問 / 運営回答</title>
+<title>选择进入端</title>
 <style>
   * { box-sizing: border-box; }
 
-  /* ===== 字体設定 =====
-     日语 → 明朝体
-     中文 → 黑体
-  */
   :root{
     --font-jp:"Yu Mincho","Hiragino Mincho ProN","MS PMincho","Noto Serif JP",serif;
     --font-cn:"PingFang SC","Microsoft YaHei","Source Han Sans SC","Noto Sans SC","Heiti SC",sans-serif;
@@ -33,6 +29,76 @@
     gap: 20px;
   }
 
+  /* ===== 导航页样式 ===== */
+  #page-nav {
+    margin-top: 40px;
+    text-align: center;
+  }
+  .nav-title {
+    font-family: var(--font-cn);
+    font-size: 24px;
+    font-weight: 700;
+    color: #8a6d2f;
+    margin-bottom: 30px;
+    letter-spacing: .1em;
+  }
+  .nav-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .nav-btn {
+    display: block;
+    text-align: center;
+    padding: 30px 20px;
+    background: #b8913f;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 14px;
+    font-family: var(--font-cn);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    box-shadow: 0 4px 15px rgba(184, 145, 63, 0.2);
+    transition: all 0.25s ease;
+    border: 1px solid #a37f33;
+    cursor: pointer;
+  }
+  .nav-btn:hover {
+    background: #a37f33;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(184, 145, 63, 0.35);
+  }
+  .nav-btn:active { transform: translateY(0); }
+  .nav-btn.disabled {
+    background: #ccc;
+    border-color: #bbb;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.7;
+  }
+
+  /* ===== 答题页样式（原本的样式） ===== */
+  #page-student {
+    display: none; /* 默认隐藏 */
+  }
+  .back-btn {
+    display: inline-block;
+    margin-bottom: 15px;
+    padding: 10px 20px;
+    background: #e8e3d6;
+    color: #5f5a4f;
+    border: none;
+    border-radius: 9px;
+    font-family: var(--font-cn);
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .back-btn:hover { background: #ddd6c4; }
+
   .panel {
     background: #fff;
     border: 1px solid #e6e2d9;
@@ -40,13 +106,10 @@
     padding: 20px 22px;
     box-shadow: 0 2px 10px rgba(0,0,0,.05);
   }
-
   .question-panel {
     border-left: 5px solid #c8a45c;
     background: #fdfcf8;
   }
-
-  /* パネル見出し（日本語） */
   .panel-title {
     margin: 0 0 12px;
     font-family: var(--font-jp);
@@ -55,310 +118,86 @@
     letter-spacing: .12em;
     color: #a8863c;
   }
-
-  /* 質問本文（日本語） */
   .question-text {
     margin: 0;
     font-family: var(--font-jp);
     font-size: 16px;
     line-height: 1.95;
   }
-
-  /* 回答入力（日本語入力） */
   textarea {
-    width: 100%;
-    min-height: 170px;
-    padding: 14px 16px;
-    font-family: var(--font-jp);
-    font-size: 15px;
-    line-height: 1.85;
-    color: #2c2a26;
-    background: #fcfcfa;
-    border: 1px solid #ddd8cc;
-    border-radius: 10px;
-    resize: vertical;
-    outline: none;
+    width: 100%; min-height: 170px; padding: 14px 16px;
+    font-family: var(--font-jp); font-size: 15px; line-height: 1.85;
+    color: #2c2a26; background: #fcfcfa; border: 1px solid #ddd8cc;
+    border-radius: 10px; resize: vertical; outline: none;
     transition: border-color .2s, box-shadow .2s;
   }
   textarea::placeholder { color: #b3ada1; font-family: var(--font-jp); }
-  textarea:focus {
-    border-color: #c8a45c;
-    box-shadow: 0 0 0 3px rgba(200,164,92,.18);
-    background: #fff;
-  }
-
-  .footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 14px;
-    gap: 12px;
-  }
-
-  .counter {
-    font-size: 12px;
-    color: #a9a396;
-    font-family: var(--font-jp);
-  }
-
-  button {
-    padding: 11px 34px;
-    font-family: var(--font-jp);
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: .06em;
-    color: #fff;
-    background: #b8913f;
-    border: none;
-    border-radius: 9px;
-    cursor: pointer;
+  textarea:focus { border-color: #c8a45c; box-shadow: 0 0 0 3px rgba(200,164,92,.18); background: #fff; }
+  .footer { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 12px; }
+  .counter { font-size: 12px; color: #a9a396; font-family: var(--font-jp); }
+  button.submit-btn {
+    padding: 11px 34px; font-family: var(--font-jp); font-size: 15px;
+    font-weight: 700; letter-spacing: .06em; color: #fff;
+    background: #b8913f; border: none; border-radius: 9px; cursor: pointer;
     transition: background .18s, transform .08s;
   }
-  button:hover  { background: #a37f33; }
-  button:active { transform: translateY(1px); }
+  button.submit-btn:hover { background: #a37f33; }
+  button.submit-btn:active { transform: translateY(1px); }
 
-  /* ローディング */
-  .loading {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    padding: 32px 20px;
-  }
+  .loading { display: none; flex-direction: column; align-items: center; gap: 16px; padding: 32px 20px; }
   .loading.show { display: flex; }
-
-  .spinner {
-    width: 42px; height: 42px;
-    border: 4px solid #e6e2d9;
-    border-top-color: #b8913f;
-    border-radius: 50%;
-    animation: spin .9s linear infinite;
-  }
+  .spinner { width: 42px; height: 42px; border: 4px solid #e6e2d9; border-top-color: #b8913f; border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 14px; color: #a8863c; letter-spacing: .1em; font-family: var(--font-jp); }
 
-  .loading-text {
-    font-size: 14px;
-    color: #a8863c;
-    letter-spacing: .1em;
-    font-family: var(--font-jp);
-  }
-
-  /* 評価結果 */
-  .result {
-    display: none;
-    flex-direction: column;
-    gap: 16px;
-  }
+  .result { display: none; flex-direction: column; gap: 16px; }
   .result.show { display: flex; }
-
-  /* 結果タイトル：中文 → 黑体 */
-  .result-title {
-    font-family: var(--font-cn);
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: .08em;
-    color: #8a6d2f;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #f0ece2;
-  }
-
-  .dim {
-    padding: 14px 0;
-    border-bottom: 1px dashed #eee9dd;
-  }
+  .result-title { font-family: var(--font-cn); font-size: 15px; font-weight: 700; letter-spacing: .08em; color: #8a6d2f; padding-bottom: 12px; border-bottom: 2px solid #f0ece2; }
+  .dim { padding: 14px 0; border-bottom: 1px dashed #eee9dd; }
   .dim:last-of-type { border-bottom: none; }
-
-  .dim-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-
-  /* 次元名：中文 → 黑体 */
-  .dim-name {
-    font-family: var(--font-cn);
-    font-size: 14px;
-    font-weight: 700;
-    color: #2c2a26;
-  }
-
-  .dim-score {
-    font-size: 22px;
-    font-weight: 700;
-    color: #b8913f;
-    line-height: 1;
-    font-family: var(--font-jp);
-  }
+  .dim-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .dim-name { font-family: var(--font-cn); font-size: 14px; font-weight: 700; color: #2c2a26; }
+  .dim-score { font-size: 22px; font-weight: 700; color: #b8913f; line-height: 1; font-family: var(--font-jp); }
   .dim-score.low { color: #c07a1e; }
   .dim-score.critical { color: #b04a42; }
-
-  .dim-bar {
-    height: 6px;
-    background: #f0ece2;
-    border-radius: 3px;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-  .dim-bar span {
-    display: block;
-    height: 100%;
-    background: linear-gradient(90deg, #d9b96a, #b8913f);
-    border-radius: 3px;
-    transition: width 1s ease;
-  }
+  .dim-bar { height: 6px; background: #f0ece2; border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
+  .dim-bar span { display: block; height: 100%; background: linear-gradient(90deg, #d9b96a, #b8913f); border-radius: 3px; transition: width 1s ease; }
   .dim-bar span.low { background: linear-gradient(90deg, #e8b96a, #c07a1e); }
   .dim-bar span.critical { background: linear-gradient(90deg, #e88a82, #b04a42); }
-
-  /* 診断コメント：中文 → 黑体 */
-  .dim-feedback {
-    font-family: var(--font-cn);
-    font-size: 13.5px;
-    line-height: 1.9;
-    color: #5f5a4f;
-  }
+  .dim-feedback { font-family: var(--font-cn); font-size: 13.5px; line-height: 1.9; color: #5f5a4f; }
   .dim-feedback .good { color: #4a8a3f; font-weight: 600; }
   .dim-feedback .warn { color: #c07a1e; font-weight: 600; }
-  .dim-feedback .bad  { color: #b04a42; font-weight: 600; }
+  .dim-feedback .bad { color: #b04a42; font-weight: 600; }
 
-  /* 玩家好感度 */
-  .fav-box {
-    background: linear-gradient(135deg, #fdfaf3 0%, #faf5e8 100%);
-    border: 1px solid #f0e8d5;
-    border-radius: 12px;
-    padding: 20px 22px;
-    margin-top: 4px;
-  }
-
-  .fav-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 14px;
-  }
-
-  /* ラベル：中文 → 黑体 */
-  .fav-label {
-    font-family: var(--font-cn);
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: .12em;
-    color: #8a6d2f;
-  }
-
-  .fav-value {
-    font-size: 42px;
-    font-weight: 700;
-    line-height: 1;
-    color: #b8913f;
-    font-family: var(--font-jp);
-  }
-  .fav-value.green  { color: #3d7a30; }
+  .fav-box { background: linear-gradient(135deg, #fdfaf3 0%, #faf5e8 100%); border: 1px solid #f0e8d5; border-radius: 12px; padding: 20px 22px; margin-top: 4px; }
+  .fav-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+  .fav-label { font-family: var(--font-cn); font-size: 14px; font-weight: 700; letter-spacing: .12em; color: #8a6d2f; }
+  .fav-value { font-size: 42px; font-weight: 700; line-height: 1; color: #b8913f; font-family: var(--font-jp); }
+  .fav-value.green { color: #3d7a30; }
   .fav-value.yellow { color: #c07a1e; }
-  .fav-value.red    { color: #b04a42; }
-
-  .fav-bar {
-    height: 12px;
-    background: #efe8d5;
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 12px;
-  }
-  .fav-bar span {
-    display: block;
-    height: 100%;
-    border-radius: 6px;
-    background: linear-gradient(90deg, #d9b96a, #b8913f);
-    transition: width 1.2s ease;
-    width: 0;
-  }
-  .fav-bar span.green  { background: linear-gradient(90deg, #7ebc68, #3d7a30); }
+  .fav-value.red { color: #b04a42; }
+  .fav-bar { height: 12px; background: #efe8d5; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .fav-bar span { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #d9b96a, #b8913f); transition: width 1.2s ease; width: 0; }
+  .fav-bar span.green { background: linear-gradient(90deg, #7ebc68, #3d7a30); }
   .fav-bar span.yellow { background: linear-gradient(90deg, #e8b96a, #c07a1e); }
-  .fav-bar span.red    { background: linear-gradient(90deg, #e88a82, #b04a42); }
-
-  /* 好感度コメント：中文 → 黑体 */
-  .fav-note {
-    font-family: var(--font-cn);
-    font-size: 13.5px;
-    line-height: 1.9;
-    color: #6b5a2a;
-  }
+  .fav-bar span.red { background: linear-gradient(90deg, #e88a82, #b04a42); }
+  .fav-note { font-family: var(--font-cn); font-size: 13.5px; line-height: 1.9; color: #6b5a2a; }
   .fav-note .em { font-weight: 700; }
-
-  /* ===== 底部三个判定按钮 ===== */
-  .decision-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 8px;
-  }
-
-  /* 判定ボタン：中文 → 黑体 */
-  .decision-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px 12px;
-    border-radius: 12px;
-    font-family: var(--font-cn);
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: .12em;
-    border: 2px solid transparent;
-    transition: all .25s;
-    cursor: default;
-    user-select: none;
-    opacity: .35;
-    transform: scale(.96);
-  }
-
-  .decision-btn.red    { background: #fbe9e7; color: #b04a42; border-color: #f0c8c2; }
+  .decision-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 8px; }
+  .decision-btn { display: flex; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; font-family: var(--font-cn); font-size: 18px; font-weight: 700; letter-spacing: .12em; border: 2px solid transparent; transition: all .25s; cursor: default; user-select: none; opacity: .35; transform: scale(.96); }
+  .decision-btn.red { background: #fbe9e7; color: #b04a42; border-color: #f0c8c2; }
   .decision-btn.yellow { background: #fdf5e0; color: #a37f33; border-color: #f0e0b0; }
-  .decision-btn.green  { background: #e8f3e3; color: #3d7a30; border-color: #c8e2be; }
-
-  .decision-btn.active {
-    opacity: 1;
-    transform: scale(1);
-    box-shadow: 0 6px 20px rgba(0,0,0,.12);
-    border-width: 3px;
-  }
-
-  .decision-btn.red.active    { background: #b04a42; color: #fff; border-color: #8a322b; }
+  .decision-btn.green { background: #e8f3e3; color: #3d7a30; border-color: #c8e2be; }
+  .decision-btn.active { opacity: 1; transform: scale(1); box-shadow: 0 6px 20px rgba(0,0,0,.12); border-width: 3px; }
+  .decision-btn.red.active { background: #b04a42; color: #fff; border-color: #8a322b; }
   .decision-btn.yellow.active { background: #c89020; color: #fff; border-color: #a37f33; }
-  .decision-btn.green.active  { background: #3d7a30; color: #fff; border-color: #2e5e25; }
-
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 4px;
-  }
-  /* 戻るボタン：日本語 → 明朝 */
-  .btn-secondary {
-    background: #e8e3d6;
-    color: #5f5a4f;
-    padding: 10px 24px;
-    font-size: 14px;
-    font-family: var(--font-jp);
-  }
+  .decision-btn.green.active { background: #3d7a30; color: #fff; border-color: #2e5e25; }
+  .actions { display: flex; justify-content: flex-end; margin-top: 4px; }
+  .btn-secondary { background: #e8e3d6; color: #5f5a4f; padding: 10px 24px; font-size: 14px; font-family: var(--font-jp); border: none; border-radius: 9px; cursor: pointer; }
   .btn-secondary:hover { background: #ddd6c4; }
 
-  #toast {
-    position: fixed;
-    left: 50%;
-    bottom: 32px;
-    transform: translate(-50%, 14px);
-    padding: 12px 26px;
-    font-size: 14px;
-    color: #fff;
-    background: #3b3730;
-    border-radius: 30px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .25s, transform .25s;
-    z-index: 999;
-    font-family: var(--font-jp);
-  }
-  #toast.show  { opacity: 1; transform: translate(-50%, 0); }
+  #toast { position: fixed; left: 50%; bottom: 32px; transform: translate(-50%, 14px); padding: 12px 26px; font-size: 14px; color: #fff; background: #3b3730; border-radius: 30px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 999; font-family: var(--font-jp); }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
   #toast.error { background: #b04a42; }
 </style>
 </head>
@@ -366,408 +205,241 @@
 
 <div class="wrap">
 
-  <!-- ====== 新增的跳转按钮开始 ====== -->
-  <a href="student.html" style="display: block; text-align: center; padding: 15px; background: #b8913f; color: #fff; text-decoration: none; border-radius: 9px; font-weight: bold; margin-bottom: 10px;">点击进入 学生端</a>
-  <a href="studentt.html" style="display: block; text-align: center; padding: 15px; background: #b8913f; color: #fff; text-decoration: none; border-radius: 9px; font-weight: bold; margin-bottom: 10px;">点击进入 学生端（2）</a>
-  <a href="studenttt.html" style="display: block; text-align: center; padding: 15px; background: #b8913f; color: #fff; text-decoration: none; border-radius: 9px; font-weight: bold; margin-bottom: 10px;">点击进入 学生端（3）</a>
-  <!-- ====== 新增的跳转按钮结束 ====== -->
-
-  <section class="panel question-panel">
-    <h2 class="panel-title">プレイヤー質問</h2>
-    <p class="question-text">
-      雲菫の衣装や歌い方は歌舞伎に少し似ています。どのような文化をもとにしているんですか。
-    </p>
-  </section>
-
-  <section class="panel">
-    <h2 class="panel-title">運営人員回答</h2>
-
-    <div id="inputArea">
-      <textarea id="answer" maxlength="1000" placeholder="ここに回答を入力してください…"></textarea>
-      <div class="footer">
-        <span class="counter" id="counter">0 文字</span>
-        <button id="submitBtn">送信</button>
-      </div>
+  <!-- ================= 导航页（默认显示） ================= -->
+  <div id="page-nav">
+    <div class="nav-title">请选择进入的端</div>
+    <div class="nav-grid">
+      <!-- 点击学生端，执行 showStudent() -->
+      <div class="nav-btn" onclick="showStudent()">学生端</div>
+      <!-- 其他端暂时为不可点击状态 -->
+      <div class="nav-btn disabled">教师端（敬请期待）</div>
+      <div class="nav-btn disabled">运营端（敬请期待）</div>
+      <div class="nav-btn disabled">管理员端（敬请期待）</div>
     </div>
+  </div>
 
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-      <div class="loading-text">AIが回答を評価しています…</div>
-    </div>
+  <!-- ================= 答题页（默认隐藏） ================= -->
+  <div id="page-student">
+    <!-- 返回按钮 -->
+    <button class="back-btn" onclick="goBack()">← 返回首页</button>
 
-    <div class="result" id="result">
-      <div class="result-title">AI 评价结果</div>
+    <section class="panel question-panel">
+      <h2 class="panel-title">プレイヤー質問</h2>
+      <p class="question-text">
+        雲菫の衣装や歌い方は歌舞伎に少し似ています。どのような文化をもとにしているんですか。
+      </p>
+    </section>
 
-      <div class="dim">
-        <div class="dim-head">
-          <span class="dim-name">日语语言运用</span>
-          <span class="dim-score" id="score0">0</span>
+    <section class="panel" style="margin-top: 20px;">
+      <h2 class="panel-title">運営人員回答</h2>
+
+      <div id="inputArea">
+        <textarea id="answer" maxlength="1000" placeholder="ここに回答を入力してください…"></textarea>
+        <div class="footer">
+          <span class="counter" id="counter">0 文字</span>
+          <button class="submit-btn" id="submitBtn">送信</button>
         </div>
-        <div class="dim-bar"><span id="bar0"></span></div>
-        <div class="dim-feedback" id="fb0"></div>
       </div>
 
-      <div class="dim">
-        <div class="dim-head">
-          <span class="dim-name">温和澄清来源</span>
-          <span class="dim-score" id="score1">0</span>
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div class="loading-text">AIが回答を評価しています…</div>
+      </div>
+
+      <div class="result" id="result">
+        <div class="result-title">AI 评价结果</div>
+        <div class="dim">
+          <div class="dim-head"><span class="dim-name">日语语言运用</span><span class="dim-score" id="score0">0</span></div>
+          <div class="dim-bar"><span id="bar0"></span></div><div class="dim-feedback" id="fb0"></div>
         </div>
-        <div class="dim-bar"><span id="bar1"></span></div>
-        <div class="dim-feedback" id="fb1"></div>
-      </div>
-
-      <div class="dim">
-        <div class="dim-head">
-          <span class="dim-name">承接玩家观察</span>
-          <span class="dim-score" id="score2">0</span>
+        <div class="dim">
+          <div class="dim-head"><span class="dim-name">温和澄清来源</span><span class="dim-score" id="score1">0</span></div>
+          <div class="dim-bar"><span id="bar1"></span></div><div class="dim-feedback" id="fb1"></div>
         </div>
-        <div class="dim-bar"><span id="bar2"></span></div>
-        <div class="dim-feedback" id="fb2"></div>
-      </div>
-
-      <div class="dim">
-        <div class="dim-head">
-          <span class="dim-name">鼓励继续交流</span>
-          <span class="dim-score" id="score3">0</span>
+        <div class="dim">
+          <div class="dim-head"><span class="dim-name">承接玩家观察</span><span class="dim-score" id="score2">0</span></div>
+          <div class="dim-bar"><span id="bar2"></span></div><div class="dim-feedback" id="fb2"></div>
         </div>
-        <div class="dim-bar"><span id="bar3"></span></div>
-        <div class="dim-feedback" id="fb3"></div>
-      </div>
-
-      <!-- 玩家好感度 -->
-      <div class="fav-box">
-        <div class="fav-head">
-          <span class="fav-label">玩家好感度</span>
-          <span class="fav-value" id="favValue">0%</span>
+        <div class="dim">
+          <div class="dim-head"><span class="dim-name">鼓励继续交流</span><span class="dim-score" id="score3">0</span></div>
+          <div class="dim-bar"><span id="bar3"></span></div><div class="dim-feedback" id="fb3"></div>
         </div>
-        <div class="fav-bar"><span id="favBar"></span></div>
-        <div class="fav-note" id="favNote"></div>
+        <div class="fav-box">
+          <div class="fav-head"><span class="fav-label">玩家好感度</span><span class="fav-value" id="favValue">0%</span></div>
+          <div class="fav-bar"><span id="favBar"></span></div><div class="fav-note" id="favNote"></div>
+        </div>
+        <div class="decision-row">
+          <div class="decision-btn red" id="decRed">禁止发布</div>
+          <div class="decision-btn yellow" id="decYellow">修改后发布</div>
+          <div class="decision-btn green" id="decGreen">可以发布</div>
+        </div>
+        <div class="actions">
+          <button class="btn-secondary" id="retryBtn">もう一度書く</button>
+        </div>
       </div>
-
-      <!-- 底部三个判定 -->
-      <div class="decision-row">
-        <div class="decision-btn red"    id="decRed">禁止发布</div>
-        <div class="decision-btn yellow" id="decYellow">修改后发布</div>
-        <div class="decision-btn green"  id="decGreen">可以发布</div>
-      </div>
-
-      <div class="actions">
-        <button class="btn-secondary" id="retryBtn">もう一度書く</button>
-      </div>
-    </div>
-
-  </section>
+    </section>
+  </div>
 
 </div>
 
 <div id="toast"></div>
 
 <script>
-  var ta        = document.getElementById('answer');
-  var counter   = document.getElementById('counter');
-  var btn       = document.getElementById('submitBtn');
-  var toast     = document.getElementById('toast');
-  var inputArea = document.getElementById('inputArea');
-  var loading   = document.getElementById('loading');
-  var result    = document.getElementById('result');
-  var retryBtn  = document.getElementById('retryBtn');
-
-  ta.addEventListener('input', function () {
-    counter.textContent = ta.value.length + ' 文字';
-  });
-
-  var timer;
-  function showToast(msg, isError) {
-    toast.textContent = msg;
-    toast.className = 'show' + (isError ? ' error' : '');
-    clearTimeout(timer);
-    timer = setTimeout(function () { toast.className = ''; }, 2200);
+  // ==================== 页面切换逻辑 ====================
+  function showStudent() {
+    document.getElementById('page-nav').style.display = 'none';
+    document.getElementById('page-student').style.display = 'block';
   }
 
-  function submit() {
-    var text = ta.value.trim();
-    if (!text) {
-      showToast('回答を入力してください', true);
-      ta.focus();
-      return;
-    }
-    inputArea.style.display = 'none';
+  function goBack() {
+    document.getElementById('page-student').style.display = 'none';
+    document.getElementById('page-nav').style.display = 'block';
+    // 返回时重置学生端的状态
+    document.getElementById('inputArea').style.display = 'block';
+    document.getElementById('result').classList.remove('show');
+    document.getElementById('answer').value = '';
+    document.getElementById('counter').textContent = '0 文字';
+  }
+
+  // ==================== 原本的 AI 评价逻辑 ====================
+  var ta=document.getElementById('answer'),counter=document.getElementById('counter'),btn=document.getElementById('submitBtn'),toast=document.getElementById('toast'),inputArea=document.getElementById('inputArea'),loading=document.getElementById('loading'),result=document.getElementById('result'),retryBtn=document.getElementById('retryBtn');
+  
+  ta.addEventListener('input',function(){counter.textContent=ta.value.length+' 文字';});
+  
+  var timer;
+  function showToast(msg,isError){
+    toast.textContent=msg;
+    toast.className='show'+(isError?' error':'');
+    clearTimeout(timer);
+    timer=setTimeout(function(){toast.className='';},2200);
+  }
+  
+  function submit(){
+    var text=ta.value.trim();
+    if(!text){showToast('回答を入力してください',true);ta.focus();return;}
+    inputArea.style.display='none';
     result.classList.remove('show');
     loading.classList.add('show');
-
-    setTimeout(function () {
+    setTimeout(function(){
       loading.classList.remove('show');
-      var ev = evaluate(text);
+      var ev=evaluate(text);
       render(ev);
       result.classList.add('show');
-    }, 1400);
+    },1400);
   }
-
-  btn.addEventListener('click', submit);
-  ta.addEventListener('keydown', function (e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') submit();
-  });
-
-  retryBtn.addEventListener('click', function () {
+  
+  btn.addEventListener('click',submit);
+  ta.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='Enter')submit();});
+  
+  retryBtn.addEventListener('click',function(){
     result.classList.remove('show');
-    inputArea.style.display = 'block';
+    inputArea.style.display='block';
     ta.focus();
   });
 
-  // ===================================================
-  //  評価ロジック
-  // ===================================================
-  function evaluate(text) {
-    var len = text.length;
+  function evaluate(text){
+    var len=text.length;var jp=88;var jpNotes=[];
+    var keigoHits=(text.match(/です|ます|ございます|いたします|申し上げます|おります|ではありません/g)||[]).length;
+    if(keigoHits>=2){jp+=10;jpNotes.push('<span class="good">✅ 敬体稳定，文体得体。</span>');}
+    else if(keigoHits>=1){jp+=5;jpNotes.push('<span class="good">✅ 使用了敬体。</span>');}
+    else{jp-=12;jpNotes.push('<span class="warn">⚠️ 敬体不足，建议统一为「です・ます」体。</span>');}
+    var casual=(text.match(/だ。|だ！|する。|した。|である。/g)||[]).length;
+    if(casual>0){jp-=12*casual;jpNotes.push('<span class="bad">❌ 混入常体，应统一为敬体。</span>');}
+    if(len<40){jp-=8;jpNotes.push('<span class="warn">⚠️ 句子太短，建议2～3句说明。</span>');}
+    else if(len>400){jp-=4;jpNotes.push('<span class="warn">⚠️ 篇幅偏长，注意可读性。</span>');}
+    jp=clamp(jp,60,100);
+    var jpSuggest='';if(jp>=95){jpSuggest='日语表达基本没有问题，无需修改。';}
+    else if(casual>0){jpSuggest='把常体统一为敬体。';}
+    else{jpSuggest='统一使用「です・ます」体。';}
 
-    // ---------- 1. 日语语言运用 ----------
-    var jp = 88;
-    var jpNotes = [];
+    var clarify=40;var clarifyNotes=[];
+    if(/京劇|中国の伝統|中国伝統|戯曲|伝統演劇/.test(text)){clarify+=25;clarifyNotes.push('<span class="good">✅ 正确指出中国京剧・传统戏剧。</span>');}
+    else{clarifyNotes.push('<span class="bad">❌ 未明示文化来源，应写「中国の伝統演劇、特に京劇」。</span>');}
+    var harsh=(text.match(/違います|間違|ではありません|じゃない/g)||[]).length;
+    var soft=/確かに|おっしゃる通り|ご指摘|なるほど|実は/.test(text);
+    if(harsh>=1&&!soft){clarify-=10;clarifyNotes.push('<span class="warn">⚠️ 直接否定太生硬，应先认同再纠正。</span>');}
+    else if(harsh>=1&&soft){clarifyNotes.push('<span class="good">✅ 否定时也尊重了对方观点。</span>');}
+    else if(!harsh){clarify+=15;clarifyNotes.push('<span class="good">✅ 未使用生硬否定，表达温和。</span>');}
+    if(/ではありません|です|ます/.test(text)){clarify+=15;clarifyNotes.push('<span class="good">✅ 用敬体礼貌传达。</span>');}
+    clarify=clamp(clarify,20,100);
+    var clarifySuggest='';if(clarify>=90){clarifySuggest='来源说明与语气都没有问题。';}
+    else if(harsh>=1&&!soft){clarifySuggest='把「それは違います」换成「実は〜なんです」。';}
+    else{clarifySuggest='明确写出「中国の伝統演劇、特に京劇」。';}
 
-    var keigoHits = (text.match(/です|ます|ございます|いたします|申し上げます|おります|ではありません/g) || []).length;
-    if (keigoHits >= 2) {
-      jp += 10;
-      jpNotes.push('<span class="good">✅ 敬体稳定，文体得体。</span>');
-    } else if (keigoHits >= 1) {
-      jp += 5;
-      jpNotes.push('<span class="good">✅ 使用了敬体。</span>');
-    } else {
-      jp -= 12;
-      jpNotes.push('<span class="warn">⚠️ 敬体不足，建议统一为「です・ます」体。</span>');
-    }
+    var receive=25;var receiveNotes=[];
+    if(/歌舞伎/.test(text)){receive+=20;receiveNotes.push('<span class="good">✅ 提到了玩家说的「歌舞伎」。</span>');}
+    else{receiveNotes.push('<span class="bad">❌ 未回应玩家「像歌舞伎」的观察。</span>');}
+    if(/似|共通|近い|思われる|感じ/.test(text)){receive+=15;receiveNotes.push('<span class="good">✅ 触及了相似点。</span>');}
+    else{receiveNotes.push('<span class="warn">⚠️ 应先说「確かに似ている部分もあります」。</span>');}
+    if(/確かに|おっしゃる通り|ご指摘|なるほど/.test(text)){receive+=25;receiveNotes.push('<span class="good">✅ 有「確かに」等认同表达。</span>');}
+    else{receiveNotes.push('<span class="bad">❌ 缺少「確かに」等先认同的表达。</span>');}
+    receive=clamp(receive,10,100);
+    var receiveSuggest='';if(receive>=80){receiveSuggest='能好好接住玩家的观察。';}
+    else{receiveSuggest='开头加一句「確かに歌舞伎と似ている部分もありますね」。';}
 
-    var casual = (text.match(/だ。|だ！|する。|した。|である。/g) || []).length;
-    if (casual > 0) {
-      jp -= 12 * casual;
-      jpNotes.push('<span class="bad">❌ 混入常体，应统一为敬体。</span>');
-    }
+    var encourage=25;var encourageNotes=[];
+    if(/ぜひ|お気軽|いつでも|質問|聞かせて|教えて|楽しんで/.test(text)){encourage+=30;encourageNotes.push('<span class="good">✅ 有邀请继续对话的表达。</span>');}
+    else{encourageNotes.push('<span class="bad">❌ 缺少「ぜひお気軽にご質問ください」等邀请。</span>');}
+    if(/ありがとう|感謝|うれしい|嬉しい/.test(text)){encourage+=20;encourageNotes.push('<span class="good">✅ 表达了感谢。</span>');}
+    else{encourageNotes.push('<span class="warn">⚠️ 加一句「ご関心ありがとうございます」。</span>');}
+    if(/応援|一緒に|これからも|よろしく/.test(text)){encourage+=15;encourageNotes.push('<span class="good">✅ 有面向未来的表达。</span>');}
+    else{encourageNotes.push('<span class="warn">⚠️ 加一句「これからも〜を楽しんでください」。</span>');}
+    encourage=clamp(encourage,10,100);
+    var encourageSuggest='';if(encourage>=80){encourageSuggest='有继续对话的姿态。';}
+    else{encourageSuggest='结尾加「ぜひお気軽にご質問ください」。';}
 
-    if (len < 40) {
-      jp -= 8;
-      jpNotes.push('<span class="warn">⚠️ 句子太短，建议2～3句说明。</span>');
-    } else if (len > 400) {
-      jp -= 4;
-      jpNotes.push('<span class="warn">⚠️ 篇幅偏长，注意可读性。</span>');
-    }
+    var scores=[jp,clarify,receive,encourage];var min=Math.min.apply(null,scores);var level;
+    if(min>=75){level='green';}else if(min>=25){level='yellow';}else{level='red';}
 
-    jp = clamp(jp, 60, 100);
-
-    var jpSuggest = '';
-    if (jp >= 95) {
-      jpSuggest = '日语表达基本没有问题，无需修改。';
-    } else if (casual > 0) {
-      jpSuggest = '把常体统一为敬体。';
-    } else {
-      jpSuggest = '统一使用「です・ます」体。';
-    }
-
-    // ---------- 2. 温和澄清来源 ----------
-    var clarify = 40;
-    var clarifyNotes = [];
-
-    if (/京劇|中国の伝統|中国伝統|戯曲|伝統演劇/.test(text)) {
-      clarify += 25;
-      clarifyNotes.push('<span class="good">✅ 正确指出中国京剧・传统戏剧。</span>');
-    } else {
-      clarifyNotes.push('<span class="bad">❌ 未明示文化来源，应写「中国の伝統演劇、特に京劇」。</span>');
-    }
-
-    var harsh = (text.match(/違います|間違|ではありません|じゃない/g) || []).length;
-    var soft  = /確かに|おっしゃる通り|ご指摘|なるほど|実は/.test(text);
-
-    if (harsh >= 1 && !soft) {
-      clarify -= 10;
-      clarifyNotes.push('<span class="warn">⚠️ 直接否定太生硬，应先认同再纠正。</span>');
-    } else if (harsh >= 1 && soft) {
-      clarifyNotes.push('<span class="good">✅ 否定时也尊重了对方观点。</span>');
-    } else if (!harsh) {
-      clarify += 15;
-      clarifyNotes.push('<span class="good">✅ 未使用生硬否定，表达温和。</span>');
-    }
-
-    if (/ではありません|です|ます/.test(text)) {
-      clarify += 15;
-      clarifyNotes.push('<span class="good">✅ 用敬体礼貌传达。</span>');
-    }
-
-    clarify = clamp(clarify, 20, 100);
-
-    var clarifySuggest = '';
-    if (clarify >= 90) {
-      clarifySuggest = '来源说明与语气都没有问题。';
-    } else if (harsh >= 1 && !soft) {
-      clarifySuggest = '把「それは違います」换成「実は〜なんです」。';
-    } else {
-      clarifySuggest = '明确写出「中国の伝統演劇、特に京劇」。';
-    }
-
-    // ---------- 3. 承接玩家观察 ----------
-    var receive = 25;
-    var receiveNotes = [];
-
-    if (/歌舞伎/.test(text)) {
-      receive += 20;
-      receiveNotes.push('<span class="good">✅ 提到了玩家说的「歌舞伎」。</span>');
-    } else {
-      receiveNotes.push('<span class="bad">❌ 未回应玩家「像歌舞伎」的观察。</span>');
-    }
-
-    if (/似|共通|近い|思われる|感じ/.test(text)) {
-      receive += 15;
-      receiveNotes.push('<span class="good">✅ 触及了相似点。</span>');
-    } else {
-      receiveNotes.push('<span class="warn">⚠️ 应先说「確かに似ている部分もあります」。</span>');
-    }
-
-    if (/確かに|おっしゃる通り|ご指摘|なるほど/.test(text)) {
-      receive += 25;
-      receiveNotes.push('<span class="good">✅ 有「確かに」等认同表达。</span>');
-    } else {
-      receiveNotes.push('<span class="bad">❌ 缺少「確かに」等先认同的表达。</span>');
-    }
-
-    receive = clamp(receive, 10, 100);
-
-    var receiveSuggest = '';
-    if (receive >= 80) {
-      receiveSuggest = '能好好接住玩家的观察。';
-    } else {
-      receiveSuggest = '开头加一句「確かに歌舞伎と似ている部分もありますね」。';
-    }
-
-    // ---------- 4. 鼓励继续交流 ----------
-    var encourage = 25;
-    var encourageNotes = [];
-
-    if (/ぜひ|お気軽|いつでも|質問|聞かせて|教えて|楽しんで/.test(text)) {
-      encourage += 30;
-      encourageNotes.push('<span class="good">✅ 有邀请继续对话的表达。</span>');
-    } else {
-      encourageNotes.push('<span class="bad">❌ 缺少「ぜひお気軽にご質問ください」等邀请。</span>');
-    }
-
-    if (/ありがとう|感謝|うれしい|嬉しい/.test(text)) {
-      encourage += 20;
-      encourageNotes.push('<span class="good">✅ 表达了感谢。</span>');
-    } else {
-      encourageNotes.push('<span class="warn">⚠️ 加一句「ご関心ありがとうございます」。</span>');
-    }
-
-    if (/応援|一緒に|これからも|よろしく/.test(text)) {
-      encourage += 15;
-      encourageNotes.push('<span class="good">✅ 有面向未来的表达。</span>');
-    } else {
-      encourageNotes.push('<span class="warn">⚠️ 加一句「これからも〜を楽しんでください」。</span>');
-    }
-
-    encourage = clamp(encourage, 10, 100);
-
-    var encourageSuggest = '';
-    if (encourage >= 80) {
-      encourageSuggest = '有继续对话的姿态。';
-    } else {
-      encourageSuggest = '结尾加「ぜひお気軽にご質問ください」。';
-    }
-
-    // ---------- 判定 ----------
-    var scores = [jp, clarify, receive, encourage];
-    var min = Math.min.apply(null, scores);
-
-    var level;
-    if (min >= 75) {
-      level = 'green';
-    } else if (min >= 25) {
-      level = 'yellow';
-    } else {
-      level = 'red';
-    }
-
-    // ---------- 玩家好感度 ----------
-    var fav = Math.round(
-      receive   * 0.35 +
-      encourage * 0.30 +
-      clarify   * 0.25 +
-      jp        * 0.10
-    );
-    fav = clamp(fav, 0, 100);
-
-    var favLevel, favNote;
-    if (fav >= 75) {
-      favLevel = 'green';
-      favNote  = '<span class="em">玩家抱有好感。</span>请继续保持这种温和、有回应的沟通方式。';
-    } else if (fav >= 50) {
-      favLevel = 'yellow';
-      favNote  = '<span class="em">玩家略感不满。</span>日语虽然准确，但缺少「承接玩家观察」和「邀请继续交流」两句话，好感度会被拉低。';
-    } else {
-      favLevel = 'red';
-      favNote  = '<span class="em">玩家容易产生不满。</span>仅有正确日语不够，先认同玩家的观察，再在结尾邀请继续交流，好感度才会上升。';
-    }
+    var fav=Math.round(receive*0.35+encourage*0.30+clarify*0.25+jp*0.10);fav=clamp(fav,0,100);
+    var favLevel,favNote;
+    if(fav>=75){favLevel='green';favNote='<span class="em">玩家抱有好感。</span>请继续保持这种温和、有回应的沟通方式。';}
+    else if(fav>=50){favLevel='yellow';favNote='<span class="em">玩家略感不满。</span>日语虽然准确，但缺少「承接玩家观察」和「邀请继续交流」两句话，好感度会被拉低。';}
+    else{favLevel='red';favNote='<span class="em">玩家容易产生不满。</span>仅有正确日语不够，先认同玩家的观察，再在结尾邀请继续交流，好感度才会上升。';}
 
     return {
-      dims: [
-        { score: jp,        notes: jpNotes,        suggest: jpSuggest },
-        { score: clarify,   notes: clarifyNotes,   suggest: clarifySuggest },
-        { score: receive,   notes: receiveNotes,   suggest: receiveSuggest },
-        { score: encourage, notes: encourageNotes, suggest: encourageSuggest }
+      dims:[
+        {score:jp,notes:jpNotes,suggest:jpSuggest},
+        {score:clarify,notes:clarifyNotes,suggest:clarifySuggest},
+        {score:receive,notes:receiveNotes,suggest:receiveSuggest},
+        {score:encourage,notes:encourageNotes,suggest:encourageSuggest}
       ],
-      level: level,
-      fav: fav,
-      favLevel: favLevel,
-      favNote: favNote
+      level:level,fav:fav,favLevel:favLevel,favNote:favNote
     };
   }
 
-  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
 
-  // ===================================================
-  //  レンダリング
-  // ===================================================
-  function render(ev) {
-    for (var i = 0; i < 4; i++) {
-      var d = ev.dims[i];
-      var scoreEl = document.getElementById('score' + i);
-      var barEl   = document.getElementById('bar' + i);
-      var fbEl    = document.getElementById('fb' + i);
-
-      scoreEl.textContent = d.score;
-      scoreEl.className = 'dim-score' +
-        (d.score < 40 ? ' critical' : d.score < 70 ? ' low' : '');
-
-      barEl.className = d.score < 40 ? 'critical' : d.score < 70 ? 'low' : '';
-      (function (el, sc) {
-        setTimeout(function () { el.style.width = sc + '%'; }, 60);
-      })(barEl, d.score);
-
-      var html = '';
-      d.notes.forEach(function (n) { html += n + '<br>'; });
-      html += '<span style="color:#8a6d2f;margin-top:6px;display:inline-block;">建议：' + d.suggest + '</span>';
-      fbEl.innerHTML = html;
+  function render(ev){
+    for(var i=0;i<4;i++){
+      var d=ev.dims[i];
+      var scoreEl=document.getElementById('score'+i);
+      var barEl=document.getElementById('bar'+i);
+      var fbEl=document.getElementById('fb'+i);
+      scoreEl.textContent=d.score;
+      scoreEl.className='dim-score'+(d.score<40?' critical':d.score<70?' low':'');
+      barEl.className=d.score<40?'critical':d.score<70?'low':'';
+      (function(el,sc){setTimeout(function(){el.style.width=sc+'%';},60);})(barEl,d.score);
+      var html='';d.notes.forEach(function(n){html+=n+'<br>';});
+      html+='<span style="color:#8a6d2f;margin-top:6px;display:inline-block;">建议：'+d.suggest+'</span>';
+      fbEl.innerHTML=html;
     }
+    var favValEl=document.getElementById('favValue');
+    var favBarEl=document.getElementById('favBar');
+    var favNoteEl=document.getElementById('favNote');
+    favValEl.textContent=ev.fav+'%';
+    favValEl.className='fav-value '+ev.favLevel;
+    favBarEl.className=ev.favLevel;
+    (function(el,sc){setTimeout(function(){el.style.width=sc+'%';},120);})(favBarEl,ev.fav);
+    favNoteEl.innerHTML=ev.favNote;
 
-    // 好感度
-    var favValEl = document.getElementById('favValue');
-    var favBarEl = document.getElementById('favBar');
-    var favNoteEl= document.getElementById('favNote');
-
-    favValEl.textContent = ev.fav + '%';
-    favValEl.className = 'fav-value ' + ev.favLevel;
-    favBarEl.className = ev.favLevel;
-    (function (el, sc) {
-      setTimeout(function () { el.style.width = sc + '%'; }, 120);
-    })(favBarEl, ev.fav);
-    favNoteEl.innerHTML = ev.favNote;
-
-    // 三个判定按钮
     document.getElementById('decRed').classList.remove('active');
     document.getElementById('decYellow').classList.remove('active');
     document.getElementById('decGreen').classList.remove('active');
-
-    if (ev.level === 'red')    document.getElementById('decRed').classList.add('active');
-    if (ev.level === 'yellow') document.getElementById('decYellow').classList.add('active');
-    if (ev.level === 'green')  document.getElementById('decGreen').classList.add('active');
+    if(ev.level==='red')document.getElementById('decRed').classList.add('active');
+    if(ev.level==='yellow')document.getElementById('decYellow').classList.add('active');
+    if(ev.level==='green')document.getElementById('decGreen').classList.add('active');
   }
-
 </script>
-
 </body>
 </html>
