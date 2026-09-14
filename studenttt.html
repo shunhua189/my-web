@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>日语Bug报告的填写</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --text:#263247; --muted:#748096;
+  --primary:#3d6fd8; --primary-soft:#edf3ff; --line:#dfe5ef;
+  --green:#dff3e6; --green-text:#28734a; --red:#fde4e4; --red-text:#b44747;
+  --shadow:0 8px 24px rgba(45,62,90,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;min-height:100vh}
+button,textarea{font:inherit}
+button{cursor:pointer}
+.app{width:100%;min-height:100vh;padding:28px 34px 32px}
+.header{max-width:1100px;margin:0 auto 22px}
+h1{margin:0;font-size:30px;letter-spacing:.04em;font-weight:700}
+.subtitle{margin-top:7px;color:var(--muted);font-size:14px}
+.modules{max-width:1100px;margin:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.module{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;min-height:210px;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative}
+.module-num{font-size:13px;color:var(--primary);font-weight:700}
+.module h2{font-size:20px;margin:10px 0 8px}
+.module p{font-size:14px;line-height:1.7;color:var(--muted);margin:0}
+.open-btn{margin-top:auto;width:100%;border:0;background:var(--primary);color:#fff;border-radius:11px;padding:12px;font-weight:600}
+.analysis-btn{position:absolute;right:18px;top:17px;border:0;background:#f1f4f9;color:#66738a;border-radius:18px;padding:6px 10px;font-size:12px}
+.screen{display:none;max-width:1100px;margin:0 auto}
+.screen.active{display:block}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.back-home{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 14px;color:#56647a}
+.screen-title{font-size:24px;font-weight:700}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px}
+.instructions{background:var(--primary-soft);border-radius:12px;padding:14px 16px;line-height:1.7;margin-bottom:18px}
+.footer-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.primary{border:0;background:var(--primary);color:#fff;border-radius:10px;padding:11px 22px;font-weight:600}
+.secondary{border:1px solid var(--line);background:#fff;color:#56647a;border-radius:10px;padding:11px 22px}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#263247;color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:.2s}
+.toast.show{opacity:1}
+.match-area{display:grid;grid-template-columns:1fr 1fr;gap:80px;position:relative;min-height:410px}
+.match-col{display:flex;flex-direction:column;gap:13px;z-index:2}
+.match-item{background:#f8fafc;border:2px solid #e1e6ef;border-radius:12px;padding:14px 18px;text-align:center;min-height:52px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.match-item.selected{border-color:var(--primary);background:var(--primary-soft)}
+.match-item.matched{border-color:#79b58f;background:var(--green);color:var(--green-text)}
+#matchSvg{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.analysis-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.badge{font-size:13px;padding:7px 10px;border-radius:8px;background:#f2f5fa;color:#66738a}
+.analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.word-analysis{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px}
+.word-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+.word-cell{padding:11px 10px;text-align:center;border-radius:9px;background:var(--green);color:var(--green-text);font-size:14px}
+.word-row.error .word-cell{background:var(--red);color:var(--red-text)}
+.legend{font-size:12px;color:var(--muted);margin-top:14px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.metric{padding:15px;border-radius:12px;background:#f7f9fc;text-align:center}
+.metric .label{font-size:13px;color:#68758a}
+.metric .value{font-size:20px;font-weight:700;margin-top:7px}
+.metric.warn .value{color:var(--red-text)}
+.students{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.student{border:1px solid var(--line);background:#f9fbfd;border-radius:10px;padding:14px 8px;text-align:center;color:#526077}
+.student.problem{background:#fff0f0;border-color:#f3d1d1;color:#a64b4b}
+.modal{position:fixed;inset:0;background:rgba(30,40,58,.42);display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:16px;width:min(560px,92vw);padding:24px;box-shadow:0 18px 50px rgba(0,0,0,.18);position:relative}
+.close{position:absolute;right:14px;top:12px;border:0;background:transparent;font-size:25px;color:#7c8798}
+.answer-box{margin-top:16px;background:#f7f9fc;border-radius:11px;padding:17px;line-height:2}
+textarea{width:100%;min-height:240px;border:2px solid #dfe5ef;border-radius:12px;padding:16px;resize:vertical;outline:none;line-height:1.8}
+textarea:focus{border-color:var(--primary)}
+.choice-list{display:flex;flex-direction:column;gap:13px;max-width:600px;margin:22px auto}
+.choice{border:2px solid #e0e5ee;background:#fafbfd;border-radius:12px;padding:16px;text-align:center;font-size:17px}
+.choice.selected{border-color:var(--primary);background:var(--primary-soft)}
+.chart-wrap{display:grid;grid-template-columns:300px 1fr;gap:30px;align-items:center}
+.pie{width:260px;height:260px;border-radius:50%;margin:auto;background:conic-gradient(#3d6fd8 0 60%,#7e9fe4 60% 95%,#d8a0a0 95% 100%);position:relative}
+.pie:after{content:"";position:absolute;inset:58px;background:#fff;border-radius:50%}
+.chart-legend{display:flex;flex-direction:column;gap:13px}
+.legend-row{display:flex;align-items:center;gap:9px}
+.dot{width:13px;height:13px;border-radius:50%;display:inline-block}
+.note{font-size:13px;color:var(--muted);line-height:1.7;margin-top:18px}
+@media(max-width:900px){
+ .app{padding:22px 20px}
+ .modules{grid-template-columns:1fr}
+ .module{min-height:160px}
+ .students{grid-template-columns:repeat(4,1fr)}
+ .analysis-grid{grid-template-columns:1fr}
+}
+@media(max-width:650px){
+ h1{font-size:24px}.screen-title{font-size:20px}
+ .match-area{gap:18px}.students{grid-template-columns:repeat(3,1fr)}
+ .chart-wrap{grid-template-columns:1fr}
+ .pie{width:210px;height:210px}.pie:after{inset:47px}
+}
+
+/* v2 refinements */
+.header h1{font-size:34px}
+.module-num{font-size:17px}
+.module h2{font-size:22px}
+.module p{font-size:16px}
+#analysis1 .analysis-head strong{font-size:22px}
+#analysis1 .word-analysis{grid-template-columns:1fr;gap:14px}
+#analysis1 .word-cell{font-size:18px;padding:15px 12px}
+#analysis1 .legend{font-size:16px;margin-top:16px}
+#analysis2 .analysis-head strong{font-size:23px}
+#analysis2 .metrics{gap:16px}
+#analysis2 .metric{padding:22px 14px}
+#analysis2 .metric .label{font-size:18px}
+#analysis2 .metric .value{font-size:30px}
+#analysis2 h3{font-size:20px}
+#analysis2 .student{font-size:16px;padding:16px 8px}
+.correct-answer{font-size:23px;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:10px 15px;border-radius:10px}
+#analysis3 .chart-legend{font-size:18px}
+#analysis3 .legend-row{font-size:18px}
+#analysis3 .legend-row strong{font-size:20px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div id="home" class="screen active">
+    <div class="header">
+      <h1>日语Bug报告的填写</h1>
+      
+    </div>
+    <div class="modules">
+      <div class="module">
+        <button class="analysis-btn" onclick="showScreen('analysis1')">📊 作答分析</button>
+        <div class="module-num">01</div>
+        <h2>游戏操作词汇配对</h2>
+        <p>将中文游戏操作与对应的日语表达进行配对。</p>
+        <button class="open-btn" onclick="showScreen('student1')">开始作答</button>
+      </div>
+      <div class="module">
+        <button class="analysis-btn" onclick="showScreen('analysis2')">📊 作答分析</button>
+        <div class="module-num">02</div>
+        <h2>填写「再現手順」</h2>
+        <p>将游戏 Bug 的再现步骤整理并翻译成日语。</p>
+        <button class="open-btn" onclick="showScreen('student2')">开始作答</button>
+      </div>
+      <div class="module">
+        <button class="analysis-btn" onclick="showScreen('analysis3')">📊 作答分析</button>
+        <div class="module-num">03</div>
+        <h2>接续词选择</h2>
+        <p>选择适合 Bug 报告书面表达的连接形式。</p>
+        <button class="open-btn" onclick="showScreen('student3')">开始作答</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="student1" class="screen">
+    <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">游戏操作词汇配对</div></div>
+    <div class="card">
+      <div class="instructions">请点击左侧中文词汇，再点击右侧对应的日语表达，完成全部配对。</div>
+      <div class="match-area" id="matchArea">
+        <svg id="matchSvg"></svg>
+        <div class="match-col" id="cnCol"></div>
+        <div class="match-col" id="jpCol"></div>
+      </div>
+      <div class="footer-actions"><button class="primary" onclick="submitMatch()">提交答案</button></div>
+    </div>
+  </div>
+
+  <div id="analysis1" class="screen">
+    <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">游戏操作词汇配对 · 作答分析</div></div>
+    <div class="card">
+      <div class="analysis-head"><strong>班级作答情况</strong></div>
+      <div class="word-analysis">
+        <div class="word-row error"><div class="word-cell">点击</div><div class="word-cell">クリックする</div></div>
+        <div class="word-row"><div class="word-cell">滑动</div><div class="word-cell">スワイプする</div></div>
+        <div class="word-row error"><div class="word-cell">轻触</div><div class="word-cell">タップする</div></div>
+        <div class="word-row"><div class="word-cell">拖动</div><div class="word-cell">ドラッグする</div></div>
+        <div class="word-row"><div class="word-cell">输入</div><div class="word-cell">入力する</div></div>
+        <div class="word-row"><div class="word-cell">启动</div><div class="word-cell">起動する</div></div>
+        <div class="word-row"><div class="word-cell">滚动</div><div class="word-cell">スクロールする</div></div>
+        <div class="word-row"><div class="word-cell">放大</div><div class="word-cell">拡大する</div></div>
+      </div>
+      <div class="legend">绿色：掌握较好　　红色：错误率较高</div>
+    </div>
+  </div>
+
+  <div id="student2" class="screen">
+    <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">填写「再現手順」</div></div>
+    <div class="card">
+      <div class="instructions">
+        请将以下游戏 Bug 的再现步骤翻译成日语。<br>
+        ① 游戏启动　　② 点击「活动」　　③ 打开活动页面
+      </div>
+      <textarea id="answer2" placeholder="请输入日语再現手順……"></textarea>
+      <div class="footer-actions"><button class="primary" onclick="submitText()">提交答案</button></div>
+    </div>
+  </div>
+
+  <div id="analysis2" class="screen">
+    <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">填写「再現手順」 · 作答分析</div></div>
+    <div class="card">
+      <div class="analysis-head"><strong>AI对班级回答的总体诊断</strong></div>
+      <div class="metrics">
+        <div class="metric"><div class="label">词汇准确度</div><div class="value">✓</div></div>
+        <div class="metric"><div class="label">语法准确度</div><div class="value">✓</div></div>
+        <div class="metric warn"><div class="label">文体恰当性</div><div class="value">△</div></div>
+      </div>
+      <h3>学生回答</h3>
+      <div class="students" id="students"></div>
+      
+    </div>
+  </div>
+
+  <div id="student3" class="screen">
+    <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">接续词选择</div></div>
+    <div class="card">
+      <div class="instructions" style="text-align:center;font-size:18px">
+        読み込みが完了<span style="text-decoration:underline">___________</span>、イベント画面が表示されない。
+      </div>
+      <div class="choice-list">
+        <button class="choice" onclick="choose3(this,'しなくて')">しなくて</button>
+        <button class="choice" onclick="choose3(this,'ないで')">ないで</button>
+        <button class="choice" onclick="choose3(this,'せず')">せず</button>
+      </div>
+      <div class="footer-actions"><button class="primary" onclick="submitChoice()">提交答案</button></div>
+    </div>
+  </div>
+
+  <div id="analysis3" class="screen">
+    <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">接续词选择 · 作答分析</div></div>
+    <div class="card">
+      <div class="analysis-head"><strong>班级作答情况</strong><span class="correct-answer">正确答案：せず</span></div>
+      <div class="chart-wrap">
+        <div class="pie" aria-label="饼状图"></div>
+        <div class="chart-legend">
+          <div class="legend-row"><span class="dot" style="background:#3d6fd8"></span><strong>せず　12人（60%）</strong></div>
+          <div class="legend-row"><span class="dot" style="background:#7e9fe4"></span><strong>しなくて　7人（35%）</strong></div>
+          <div class="legend-row"><span class="dot" style="background:#d8a0a0"></span><strong>ないで　1人（5%）</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <button class="close" onclick="closeModal()">×</button>
+    <h3 id="modalTitle">学生回答</h3>
+    <div class="answer-box" id="modalAnswer"></div>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+const pairs=[
+  ["点击","クリックする"],["轻触","タップする"],["滑动","スワイプする"],["拖动","ドラッグする"],
+  ["输入","入力する"],["启动","起動する"],["滚动","スクロールする"],["放大","拡大する"]
+];
+let selectedCN=null, selectedJP=null, connections=[];
+let choice3Value=null;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='student1') initMatch();
+  if(id==='analysis2') initStudents();
+  window.scrollTo(0,0);
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1400);
+}
+function initMatch(){
+  selectedCN=null;selectedJP=null;connections=[];
+  const cn=document.getElementById('cnCol'),jp=document.getElementById('jpCol');
+  cn.innerHTML='';jp.innerHTML='';
+  const shuffled=[...pairs].sort(()=>Math.random()-.5);
+  pairs.forEach((p,i)=>{
+    const b=document.createElement('button');b.className='match-item';b.textContent=p[0];b.dataset.value=p[0];
+    b.onclick=()=>selectMatch(b,'cn');cn.appendChild(b);
+  });
+  shuffled.forEach(p=>{
+    const b=document.createElement('button');b.className='match-item';b.textContent=p[1];b.dataset.value=p[1];
+    b.onclick=()=>selectMatch(b,'jp');jp.appendChild(b);
+  });
+  setTimeout(drawLines,50);
+}
+function selectMatch(btn,type){
+  if(btn.classList.contains('matched'))return;
+  if(type==='cn'){
+    document.querySelectorAll('#cnCol .match-item').forEach(x=>x.classList.remove('selected'));
+    selectedCN=btn;btn.classList.add('selected');
+  }else{
+    document.querySelectorAll('#jpCol .match-item').forEach(x=>x.classList.remove('selected'));
+    selectedJP=btn;btn.classList.add('selected');
+  }
+  if(selectedCN&&selectedJP){
+    connections.push([selectedCN.dataset.value,selectedJP.dataset.value,selectedCN,selectedJP]);
+    selectedCN.classList.add('matched');selectedJP.classList.add('matched');
+    selectedCN.classList.remove('selected');selectedJP.classList.remove('selected');
+    selectedCN=null;selectedJP=null;drawLines();
+  }
+}
+function drawLines(){
+  const area=document.getElementById('matchArea'),svg=document.getElementById('matchSvg');
+  if(!area||!svg)return;
+  svg.innerHTML='';
+  const ar=area.getBoundingClientRect();
+  connections.forEach(c=>{
+    const a=c[2].getBoundingClientRect(),b=c[3].getBoundingClientRect();
+    const x1=a.right-ar.left,y1=a.top+a.height/2-ar.top;
+    const x2=b.left-ar.left,y2=b.top+b.height/2-ar.top;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1);line.setAttribute('y1',y1);line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+    line.setAttribute('stroke','#79b58f');line.setAttribute('stroke-width','4');line.setAttribute('stroke-linecap','round');
+    svg.appendChild(line);
+  });
+}
+window.addEventListener('resize',drawLines);
+function submitMatch(){
+  if(connections.length<pairs.length){toast('请完成全部配对后再提交');return;}
+  toast('已提交，返回主界面');
+  setTimeout(()=>showScreen('home'),500);
+}
+function submitText(){
+  const v=document.getElementById('answer2').value.trim();
+  if(!v){toast('请先输入回答');return}
+  localStorage.setItem('bug_report_answer2',v);
+  toast('已提交，返回主界面');
+  setTimeout(()=>showScreen('home'),500);
+}
+function loadText(){
+  const v=localStorage.getItem('bug_report_answer2');
+  if(v)document.getElementById('answer2').value=v;
+}
+document.getElementById('student2').addEventListener('transitionend',loadText);
+function choose3(btn,v){
+  document.querySelectorAll('.choice').forEach(x=>x.classList.remove('selected'));
+  btn.classList.add('selected');choice3Value=v;
+}
+function submitChoice(){
+  if(!choice3Value){toast('请选择一个答案');return}
+  localStorage.setItem('bug_report_choice3',choice3Value);
+  toast('已提交，返回主界面');
+  setTimeout(()=>showScreen('home'),500);
+}
+function initStudents(){
+  const box=document.getElementById('students');
+  if(box.children.length)return;
+  const problems=new Set([3,7,12,17,19]);
+  for(let i=1;i<=20;i++){
+    const b=document.createElement('button');
+    b.className='student'+(problems.has(i)?' problem':'');
+    b.textContent='学生'+String(i).padStart(2,'0');
+    b.onclick=()=>openStudent(i);
+    box.appendChild(b);
+  }
+}
+function openStudent(i){
+  document.getElementById('modalTitle').textContent='学生'+String(i).padStart(2,'0')+' · 回答';
+  document.getElementById('modalAnswer').innerHTML='ゲームを起動します。<br>イベントをタップします。<br>イベント画面を開きます。';
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+loadText();
+</script>
+</body>
+</html>
