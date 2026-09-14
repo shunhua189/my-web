@@ -1,269 +1,303 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>选择进入端</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>多功能学习平台</title>
 <style>
+  /* ==================== 全局重置与导航页 ==================== */
   * { box-sizing: border-box; }
+  body { margin: 0; font-family: sans-serif; overflow-x: hidden; }
+  .app-page { display: none; min-height: 100vh; }
+  .app-page.active { display: block; }
 
-  :root{
-    --font-jp:"Yu Mincho","Hiragino Mincho ProN","MS PMincho","Noto Serif JP",serif;
-    --font-cn:"PingFang SC","Microsoft YaHei","Source Han Sans SC","Noto Sans SC","Heiti SC",sans-serif;
-  }
-
-  body {
-    margin: 0;
-    padding: 36px 16px 80px;
-    font-family: var(--font-jp);
-    background: #f2f0eb;
-    color: #2c2a26;
-    min-height: 100vh;
-  }
-
-  .wrap {
-    max-width: 760px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  /* ===== 导航页样式 ===== */
-  #page-nav {
-    margin-top: 40px;
-    text-align: center;
-  }
-  .nav-title {
-    font-family: var(--font-cn);
-    font-size: 24px;
-    font-weight: 700;
-    color: #8a6d2f;
-    margin-bottom: 30px;
-    letter-spacing: .1em;
-  }
-  .nav-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
+  #page-nav { background: #f2f0eb; padding: 60px 16px; text-align: center; }
+  #page-nav h1 { color: #8a6d2f; margin-bottom: 30px; font-size: 28px; }
+  .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 600px; margin: 0 auto; }
   .nav-btn {
-    display: block;
-    text-align: center;
-    padding: 30px 20px;
-    background: #b8913f;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 14px;
-    font-family: var(--font-cn);
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: .1em;
-    box-shadow: 0 4px 15px rgba(184, 145, 63, 0.2);
-    transition: all 0.25s ease;
-    border: 1px solid #a37f33;
-    cursor: pointer;
+    padding: 30px; font-size: 20px; font-weight: bold; color: white; border: none;
+    border-radius: 14px; cursor: pointer; transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   }
-  .nav-btn:hover {
-    background: #a37f33;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(184, 145, 63, 0.35);
-  }
-  .nav-btn:active { transform: translateY(0); }
-  .nav-btn.disabled {
-    background: #ccc;
-    border-color: #bbb;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-    opacity: 0.7;
-  }
+  .nav-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+  .nav-btn.ai { background: #b8913f; }
+  .nav-btn.info { background: #1768a5; }
+  .nav-btn.oral { background: #176aa8; }
+  .nav-btn.bug { background: #3d6fd8; }
+  @media (max-width: 600px) { .nav-grid { grid-template-columns: 1fr; } }
+</style>
 
-  /* ===== 答题页样式（原本的样式） ===== */
-  #page-student {
-    display: none; /* 默认隐藏 */
-  }
-  .back-btn {
-    display: inline-block;
-    margin-bottom: 15px;
-    padding: 10px 20px;
-    background: #e8e3d6;
-    color: #5f5a4f;
-    border: none;
-    border-radius: 9px;
-    font-family: var(--font-cn);
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background .2s;
-  }
-  .back-btn:hover { background: #ddd6c4; }
-
-  .panel {
-    background: #fff;
-    border: 1px solid #e6e2d9;
-    border-radius: 14px;
-    padding: 20px 22px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.05);
-  }
-  .question-panel {
-    border-left: 5px solid #c8a45c;
-    background: #fdfcf8;
-  }
-  .panel-title {
-    margin: 0 0 12px;
-    font-family: var(--font-jp);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: .12em;
-    color: #a8863c;
-  }
-  .question-text {
-    margin: 0;
-    font-family: var(--font-jp);
-    font-size: 16px;
-    line-height: 1.95;
-  }
-  textarea {
-    width: 100%; min-height: 170px; padding: 14px 16px;
-    font-family: var(--font-jp); font-size: 15px; line-height: 1.85;
-    color: #2c2a26; background: #fcfcfa; border: 1px solid #ddd8cc;
-    border-radius: 10px; resize: vertical; outline: none;
-    transition: border-color .2s, box-shadow .2s;
-  }
-  textarea::placeholder { color: #b3ada1; font-family: var(--font-jp); }
-  textarea:focus { border-color: #c8a45c; box-shadow: 0 0 0 3px rgba(200,164,92,.18); background: #fff; }
-  .footer { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 12px; }
-  .counter { font-size: 12px; color: #a9a396; font-family: var(--font-jp); }
-  button.submit-btn {
-    padding: 11px 34px; font-family: var(--font-jp); font-size: 15px;
-    font-weight: 700; letter-spacing: .06em; color: #fff;
-    background: #b8913f; border: none; border-radius: 9px; cursor: pointer;
-    transition: background .18s, transform .08s;
-  }
-  button.submit-btn:hover { background: #a37f33; }
-  button.submit-btn:active { transform: translateY(1px); }
-
-  .loading { display: none; flex-direction: column; align-items: center; gap: 16px; padding: 32px 20px; }
-  .loading.show { display: flex; }
-  .spinner { width: 42px; height: 42px; border: 4px solid #e6e2d9; border-top-color: #b8913f; border-radius: 50%; animation: spin .9s linear infinite; }
+<!-- ==================== 页面1：AI 评价 ==================== -->
+<style>
+  #app-ai { margin: 0; padding: 36px 16px 80px; font-family: "Yu Mincho","Hiragino Mincho ProN","MS PMincho","Noto Serif JP",serif; background: #f2f0eb; color: #2c2a26; min-height: 100vh; }
+  #app-ai .wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+  #app-ai .panel { background: #fff; border: 1px solid #e6e2d9; border-radius: 14px; padding: 20px 22px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+  #app-ai .question-panel { border-left: 5px solid #c8a45c; background: #fdfcf8; }
+  #app-ai .panel-title { margin: 0 0 12px; font-family: var(--font-jp); font-size: 13px; font-weight: 700; letter-spacing: .12em; color: #a8863c; }
+  #app-ai .question-text { margin: 0; font-size: 16px; line-height: 1.95; }
+  #app-ai textarea { width: 100%; min-height: 170px; padding: 14px 16px; font-family: var(--font-jp); font-size: 15px; line-height: 1.85; color: #2c2a26; background: #fcfcfa; border: 1px solid #ddd8cc; border-radius: 10px; resize: vertical; outline: none; transition: border-color .2s, box-shadow .2s; }
+  #app-ai textarea::placeholder { color: #b3ada1; }
+  #app-ai textarea:focus { border-color: #c8a45c; box-shadow: 0 0 0 3px rgba(200,164,92,.18); background: #fff; }
+  #app-ai .footer { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 12px; }
+  #app-ai .counter { font-size: 12px; color: #a9a396; }
+  #app-ai button { padding: 11px 34px; font-family: var(--font-jp); font-size: 15px; font-weight: 700; letter-spacing: .06em; color: #fff; background: #b8913f; border: none; border-radius: 9px; cursor: pointer; transition: background .18s, transform .08s; }
+  #app-ai button:hover { background: #a37f33; }
+  #app-ai button:active { transform: translateY(1px); }
+  #app-ai .loading { display: none; flex-direction: column; align-items: center; gap: 16px; padding: 32px 20px; }
+  #app-ai .loading.show { display: flex; }
+  #app-ai .spinner { width: 42px; height: 42px; border: 4px solid #e6e2d9; border-top-color: #b8913f; border-radius: 50%; animation: spin .9s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text { font-size: 14px; color: #a8863c; letter-spacing: .1em; font-family: var(--font-jp); }
+  #app-ai .loading-text { font-size: 14px; color: #a8863c; letter-spacing: .1em; }
+  #app-ai .result { display: none; flex-direction: column; gap: 16px; }
+  #app-ai .result.show { display: flex; }
+  #app-ai .result-title { font-family: "PingFang SC","Microsoft YaHei",sans-serif; font-size: 15px; font-weight: 700; letter-spacing: .08em; color: #8a6d2f; padding-bottom: 12px; border-bottom: 2px solid #f0ece2; }
+  #app-ai .dim { padding: 14px 0; border-bottom: 1px dashed #eee9dd; }
+  #app-ai .dim:last-of-type { border-bottom: none; }
+  #app-ai .dim-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  #app-ai .dim-name { font-family: "PingFang SC","Microsoft YaHei",sans-serif; font-size: 14px; font-weight: 700; color: #2c2a26; }
+  #app-ai .dim-score { font-size: 22px; font-weight: 700; color: #b8913f; line-height: 1; }
+  #app-ai .dim-score.low { color: #c07a1e; }
+  #app-ai .dim-score.critical { color: #b04a42; }
+  #app-ai .dim-bar { height: 6px; background: #f0ece2; border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
+  #app-ai .dim-bar span { display: block; height: 100%; background: linear-gradient(90deg, #d9b96a, #b8913f); border-radius: 3px; transition: width 1s ease; }
+  #app-ai .dim-bar span.low { background: linear-gradient(90deg, #e8b96a, #c07a1e); }
+  #app-ai .dim-bar span.critical { background: linear-gradient(90deg, #e88a82, #b04a42); }
+  #app-ai .dim-feedback { font-family: "PingFang SC","Microsoft YaHei",sans-serif; font-size: 13.5px; line-height: 1.9; color: #5f5a4f; }
+  #app-ai .dim-feedback .good { color: #4a8a3f; font-weight: 600; }
+  #app-ai .dim-feedback .warn { color: #c07a1e; font-weight: 600; }
+  #app-ai .dim-feedback .bad { color: #b04a42; font-weight: 600; }
+  #app-ai .fav-box { background: linear-gradient(135deg, #fdfaf3 0%, #faf5e8 100%); border: 1px solid #f0e8d5; border-radius: 12px; padding: 20px 22px; margin-top: 4px; }
+  #app-ai .fav-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+  #app-ai .fav-label { font-family: "PingFang SC","Microsoft YaHei",sans-serif; font-size: 14px; font-weight: 700; letter-spacing: .12em; color: #8a6d2f; }
+  #app-ai .fav-value { font-size: 42px; font-weight: 700; line-height: 1; color: #b8913f; }
+  #app-ai .fav-value.green { color: #3d7a30; }
+  #app-ai .fav-value.yellow { color: #c07a1e; }
+  #app-ai .fav-value.red { color: #b04a42; }
+  #app-ai .fav-bar { height: 12px; background: #efe8d5; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  #app-ai .fav-bar span { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #d9b96a, #b8913f); transition: width 1.2s ease; width: 0; }
+  #app-ai .fav-bar span.green { background: linear-gradient(90deg, #7ebc68, #3d7a30); }
+  #app-ai .fav-bar span.yellow { background: linear-gradient(90deg, #e8b96a, #c07a1e); }
+  #app-ai .fav-bar span.red { background: linear-gradient(90deg, #e88a82, #b04a42); }
+  #app-ai .fav-note { font-family: "PingFang SC","Microsoft YaHei",sans-serif; font-size: 13.5px; line-height: 1.9; color: #6b5a2a; }
+  #app-ai .fav-note .em { font-weight: 700; }
+  #app-ai .decision-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 8px; }
+  #app-ai .decision-btn { display: flex; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; font-family: "PingFang SC","Microsoft YaHei",sans-serif; font-size: 18px; font-weight: 700; letter-spacing: .12em; border: 2px solid transparent; transition: all .25s; cursor: default; user-select: none; opacity: .35; transform: scale(.96); }
+  #app-ai .decision-btn.red { background: #fbe9e7; color: #b04a42; border-color: #f0c8c2; }
+  #app-ai .decision-btn.yellow { background: #fdf5e0; color: #a37f33; border-color: #f0e0b0; }
+  #app-ai .decision-btn.green { background: #e8f3e3; color: #3d7a30; border-color: #c8e2be; }
+  #app-ai .decision-btn.active { opacity: 1; transform: scale(1); box-shadow: 0 6px 20px rgba(0,0,0,.12); border-width: 3px; }
+  #app-ai .decision-btn.red.active { background: #b04a42; color: #fff; border-color: #8a322b; }
+  #app-ai .decision-btn.yellow.active { background: #c89020; color: #fff; border-color: #a37f33; }
+  #app-ai .decision-btn.green.active { background: #3d7a30; color: #fff; border-color: #2e5e25; }
+  #app-ai .actions { display: flex; justify-content: flex-end; margin-top: 4px; }
+  #app-ai .btn-secondary { background: #e8e3d6; color: #5f5a4f; padding: 10px 24px; font-size: 14px; }
+  #app-ai .btn-secondary:hover { background: #ddd6c4; }
+  #app-ai #toast { position: fixed; left: 50%; bottom: 32px; transform: translate(-50%, 14px); padding: 12px 26px; font-size: 14px; color: #fff; background: #3b3730; border-radius: 30px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 999; }
+  #app-ai #toast.show { opacity: 1; transform: translate(-50%, 0); }
+  #app-ai #toast.error { background: #b04a42; }
+</style>
 
-  .result { display: none; flex-direction: column; gap: 16px; }
-  .result.show { display: flex; }
-  .result-title { font-family: var(--font-cn); font-size: 15px; font-weight: 700; letter-spacing: .08em; color: #8a6d2f; padding-bottom: 12px; border-bottom: 2px solid #f0ece2; }
-  .dim { padding: 14px 0; border-bottom: 1px dashed #eee9dd; }
-  .dim:last-of-type { border-bottom: none; }
-  .dim-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .dim-name { font-family: var(--font-cn); font-size: 14px; font-weight: 700; color: #2c2a26; }
-  .dim-score { font-size: 22px; font-weight: 700; color: #b8913f; line-height: 1; font-family: var(--font-jp); }
-  .dim-score.low { color: #c07a1e; }
-  .dim-score.critical { color: #b04a42; }
-  .dim-bar { height: 6px; background: #f0ece2; border-radius: 3px; overflow: hidden; margin-bottom: 10px; }
-  .dim-bar span { display: block; height: 100%; background: linear-gradient(90deg, #d9b96a, #b8913f); border-radius: 3px; transition: width 1s ease; }
-  .dim-bar span.low { background: linear-gradient(90deg, #e8b96a, #c07a1e); }
-  .dim-bar span.critical { background: linear-gradient(90deg, #e88a82, #b04a42); }
-  .dim-feedback { font-family: var(--font-cn); font-size: 13.5px; line-height: 1.9; color: #5f5a4f; }
-  .dim-feedback .good { color: #4a8a3f; font-weight: 600; }
-  .dim-feedback .warn { color: #c07a1e; font-weight: 600; }
-  .dim-feedback .bad { color: #b04a42; font-weight: 600; }
+<!-- ==================== 页面2：信息提取 ==================== -->
+<style>
+  #app-info { margin: 0; background: #edf5fc; color: #193550; font-family: "Microsoft YaHei", "Noto Sans JP", sans-serif; line-height: 1.65; }
+  #app-info main { max-width: 1060px; margin: auto; padding: 24px 20px 50px; }
+  #app-info .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+  #app-info h1 { margin: 0; font-size: 23px; }
+  #app-info .tag { display: inline-block; padding: 4px 12px; border-radius: 30px; background: #e0effc; color: #276296; font-size: 14px; font-weight: normal; }
+  #app-info .announcement { margin-bottom: 20px; padding: 24px 28px; border: 1px solid #dce8f2; border-top: 4px solid #1768a5; border-radius: 12px; background: white; box-shadow: 0 6px 20px #16395908; }
+  #app-info .announcement-label { margin-bottom: 8px; color: #58738a; font-size: 14px; }
+  #app-info .announcement h2 { margin: 0 0 14px; color: #164f7c; font-size: 23px; }
+  #app-info .announcement p { margin: 0; font-size: 18px; line-height: 1.95; }
+  #app-info .card { padding: 24px; border: 1px solid #dce8f2; border-radius: 12px; background: white; box-shadow: 0 6px 20px #16395908; }
+  #app-info h2 { margin: 0 0 6px; font-size: 21px; }
+  #app-info .hint { margin: 0 0 18px; color: #63788b; font-size: 15px; }
+  #app-info table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  #app-info th { padding: 10px 14px; background: #164f7c; color: white; font-size: 17px; text-align: left; }
+  #app-info th:first-child { width: 34%; }
+  #app-info td { padding: 8px 12px; border: 1px solid #dce6ef; vertical-align: middle; }
+  #app-info td:first-child { background: #f8fbfe; font-size: 16px; }
+  #app-info input, #app-info textarea { display: block; width: 100%; padding: 7px 10px; border: 1px solid #c9d9e7; border-radius: 6px; background: white; color: #193550; font: inherit; font-size: 16px; line-height: 24px; }
+  #app-info input { height: 40px; }
+  #app-info textarea { height: 64px; min-height: 64px; resize: vertical; }
+  #app-info input:focus, #app-info textarea:focus { outline: 3px solid #bfdef8; border-color: #3489c8; }
+  #app-info button { border: 0; border-radius: 9px; cursor: pointer; font: inherit; font-weight: 600; }
+  #app-info button:focus-visible { outline: 3px solid #60a8df; outline-offset: 3px; }
+  #app-info .submit { display: block; min-width: 250px; margin: 22px auto 0; padding: 12px 24px; background: #1768a5; color: white; box-shadow: 0 5px 15px #1768a526; }
+  #app-info .submit:hover { background: #125486; }
+  #app-info #status { min-height: 24px; margin: 10px 0 0; color: #486e91; font-size: 14px; text-align: center; }
+  #app-info [hidden] { display: none !important; }
+  #app-info #result { margin-top: 20px; }
+  #app-info .result-head { display: flex; align-items: center; gap: 22px; padding-bottom: 22px; border-bottom: 1px solid #e4edf4; }
+  #app-info .score { display: flex; flex-shrink: 0; flex-direction: column; align-items: center; justify-content: center; width: 108px; height: 108px; border: 6px solid #c1e0f7; border-radius: 50%; background: #eaf5ff; color: #1768a5; }
+  #app-info .score strong { font-size: 37px; line-height: 1.2; }
+  #app-info .score span { font-size: 14px; }
+  #app-info #summary { margin: 8px 0 0; font-size: 16px; }
+  #app-info .diagnosis { margin-top: 12px; padding: 14px 16px; border: 1px solid #dce8f0; border-left: 4px solid #2c9b80; border-radius: 8px; }
+  #app-info .diagnosis.review { border-left-color: #d59b32; }
+  #app-info .item-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 600; }
+  #app-info .item-title span { flex-shrink: 0; color: #397258; font-size: 14px; }
+  #app-info .review .item-title span { color: #8f641d; }
+  #app-info .diagnosis p { margin: 7px 0 0; font-size: 15px; }
+  #app-info .reference { color: #58738a; }
+  #app-info .secondary { margin-top: 20px; padding: 10px 20px; background: #eaf2fa; color: #195c91; }
+  #app-info .secondary:hover { background: #dcebf8; }
+  #app-info .note { margin: 18px 0 0; color: #667b8d; font-size: 14px; }
+  @media (max-width: 640px) { #app-info main { padding: 16px 10px 36px; } #app-info .top { align-items: flex-start; flex-wrap: wrap; } #app-info h1 { font-size: 20px; } #app-info .announcement { padding: 18px 16px; } #app-info .announcement h2 { font-size: 20px; } #app-info .announcement p { font-size: 16px; line-height: 1.85; } #app-info .card { padding: 18px 12px; } #app-info th { padding: 10px; font-size: 16px; } #app-info th:first-child { width: 36%; } #app-info td { padding: 7px; } #app-info td:first-child { font-size: 14px; overflow-wrap: anywhere; } #app-info input, #app-info textarea { padding: 7px 8px; font-size: 16px; } #app-info .submit { width: 100%; min-width: 0; } #app-info .result-head { gap: 14px; } #app-info .score { width: 86px; height: 86px; } #app-info .score strong { font-size: 29px; } #app-info #resultTitle { font-size: 19px; } }
+</style>
 
-  .fav-box { background: linear-gradient(135deg, #fdfaf3 0%, #faf5e8 100%); border: 1px solid #f0e8d5; border-radius: 12px; padding: 20px 22px; margin-top: 4px; }
-  .fav-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
-  .fav-label { font-family: var(--font-cn); font-size: 14px; font-weight: 700; letter-spacing: .12em; color: #8a6d2f; }
-  .fav-value { font-size: 42px; font-weight: 700; line-height: 1; color: #b8913f; font-family: var(--font-jp); }
-  .fav-value.green { color: #3d7a30; }
-  .fav-value.yellow { color: #c07a1e; }
-  .fav-value.red { color: #b04a42; }
-  .fav-bar { height: 12px; background: #efe8d5; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
-  .fav-bar span { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #d9b96a, #b8913f); transition: width 1.2s ease; width: 0; }
-  .fav-bar span.green { background: linear-gradient(90deg, #7ebc68, #3d7a30); }
-  .fav-bar span.yellow { background: linear-gradient(90deg, #e8b96a, #c07a1e); }
-  .fav-bar span.red { background: linear-gradient(90deg, #e88a82, #b04a42); }
-  .fav-note { font-family: var(--font-cn); font-size: 13.5px; line-height: 1.9; color: #6b5a2a; }
-  .fav-note .em { font-weight: 700; }
-  .decision-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 8px; }
-  .decision-btn { display: flex; align-items: center; justify-content: center; padding: 20px 12px; border-radius: 12px; font-family: var(--font-cn); font-size: 18px; font-weight: 700; letter-spacing: .12em; border: 2px solid transparent; transition: all .25s; cursor: default; user-select: none; opacity: .35; transform: scale(.96); }
-  .decision-btn.red { background: #fbe9e7; color: #b04a42; border-color: #f0c8c2; }
-  .decision-btn.yellow { background: #fdf5e0; color: #a37f33; border-color: #f0e0b0; }
-  .decision-btn.green { background: #e8f3e3; color: #3d7a30; border-color: #c8e2be; }
-  .decision-btn.active { opacity: 1; transform: scale(1); box-shadow: 0 6px 20px rgba(0,0,0,.12); border-width: 3px; }
-  .decision-btn.red.active { background: #b04a42; color: #fff; border-color: #8a322b; }
-  .decision-btn.yellow.active { background: #c89020; color: #fff; border-color: #a37f33; }
-  .decision-btn.green.active { background: #3d7a30; color: #fff; border-color: #2e5e25; }
-  .actions { display: flex; justify-content: flex-end; margin-top: 4px; }
-  .btn-secondary { background: #e8e3d6; color: #5f5a4f; padding: 10px 24px; font-size: 14px; font-family: var(--font-jp); border: none; border-radius: 9px; cursor: pointer; }
-  .btn-secondary:hover { background: #ddd6c4; }
+<!-- ==================== 页面3：口头应答 ==================== -->
+<style>
+  #app-oral { margin: 0; background: #eef5fb; color: #213e58; font-family: "Microsoft YaHei", "Noto Sans JP", sans-serif; font-size: 24px; line-height: 1.7; }
+  #app-oral button { font: inherit; }
+  #app-oral main { max-width: 1000px; margin: auto; padding: 36px 20px; }
+  #app-oral header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+  #app-oral h1, #app-oral h2, #app-oral p { margin: 0; }
+  #app-oral h1, #app-oral h2 { font-size: 24px; }
+  #app-oral .badge { padding: 5px 16px; border: 1px solid #ccdeed; border-radius: 30px; background: white; color: #356b94; }
+  #app-oral .progress { height: 8px; background: #dce9f4; border-radius: 10px; overflow: hidden; margin-bottom: 28px; }
+  #app-oral #progressBar { height: 100%; background: #247bbb; transition: width .25s; }
+  #app-oral .card { background: white; border: 1px solid #dce7f0; border-radius: 18px; padding: 32px; box-shadow: 0 12px 32px #1a446b09; }
+  #app-oral .player { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; color: #336382; }
+  #app-oral .avatar { width: 50px; height: 50px; border-radius: 50%; background: #e1effc; display: grid; place-items: center; font-weight: bold; }
+  #app-oral .question-box { padding: 28px; min-height: 170px; border-radius: 14px; background: #edf6ff; border: 1px solid #d4e8f8; display: flex; align-items: center; }
+  #app-oral #question { font-size: 24px; font-weight: 600; line-height: 1.9; overflow-wrap: anywhere; }
+  #app-oral .record-area { text-align: center; margin-top: 34px; }
+  #app-oral .timer { margin: 16px 0; font-variant-numeric: tabular-nums; font-weight: bold; }
+  #app-oral button { padding: 12px 24px; border-radius: 10px; border: none; cursor: pointer; }
+  #app-oral button:disabled { opacity: .45; cursor: not-allowed; }
+  #app-oral .record-btn { display: inline-flex; align-items: center; justify-content: center; gap: 12px; background: #176aa8; color: white; min-width: 260px; }
+  #app-oral .record-btn.recording { background: #c43a4a; }
+  #app-oral .record-icon { width: 18px; height: 18px; border-radius: 50%; background: white; }
+  #app-oral .recording .record-icon { border-radius: 3px; }
+  #app-oral #status { margin-top: 18px; min-height: 42px; color: #657b8c; }
+  #app-oral .waves { height: 52px; display: flex; align-items: center; justify-content: center; gap: 7px; margin: 18px 0; }
+  #app-oral .waves span { width: 6px; height: 8px; border-radius: 5px; background: #b8d3e8; }
+  #app-oral .waves.active span { background: #cf5361; animation: wave .8s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -.09s); }
+  @keyframes wave { from { height: 8px; } to { height: 44px; } }
+  #app-oral audio { display: block; width: min(100%, 500px); margin: 18px auto 0; }
+  #app-oral .navigation { display: flex; justify-content: space-between; gap: 14px; margin-top: 32px; }
+  #app-oral .secondary { background: #e5eff8; color: #245d87; }
+  #app-oral .primary { background: #176aa8; color: white; }
+  #app-oral details { margin-top: 24px; color: #667e91; }
+  #app-oral .mode-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+  #app-oral #finished { text-align: center; padding: 50px 28px; }
+  #app-oral #finished h2 { margin-bottom: 18px; }
+  #app-oral #finished button { margin-top: 28px; }
+  #app-oral [hidden] { display: none !important; }
+  @media (max-width: 600px) { #app-oral main { padding: 22px 12px; } #app-oral .card { padding: 22px 16px; } #app-oral .question-box { padding: 20px; } #app-oral .navigation { flex-wrap: wrap; } #app-oral .navigation button { flex: 1; } #app-oral .record-btn { min-width: 0; width: 100%; } }
+</style>
 
-  #toast { position: fixed; left: 50%; bottom: 32px; transform: translate(-50%, 14px); padding: 12px 26px; font-size: 14px; color: #fff; background: #3b3730; border-radius: 30px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 999; font-family: var(--font-jp); }
-  #toast.show { opacity: 1; transform: translate(-50%, 0); }
-  #toast.error { background: #b04a42; }
+<!-- ==================== 页面4：Bug报告 ==================== -->
+<style>
+  #app-bug { background: #f5f7fb; color: #263247; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif; min-height: 100vh; }
+  #app-bug button, #app-bug textarea { font: inherit; }
+  #app-bug button { cursor: pointer; }
+  #app-bug .app { width: 100%; min-height: 100vh; padding: 28px 34px 32px; }
+  #app-bug .header { max-width: 1100px; margin: 0 auto 22px; }
+  #app-bug h1 { margin: 0; font-size: 30px; letter-spacing: .04em; font-weight: 700; }
+  #app-bug .subtitle { margin-top: 7px; color: #748096; font-size: 14px; }
+  #app-bug .modules { max-width: 1100px; margin: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  #app-bug .module { background: white; border: 1px solid #dfe5ef; border-radius: 18px; padding: 22px; min-height: 210px; box-shadow: 0 8px 24px rgba(45,62,90,.08); display: flex; flex-direction: column; position: relative; }
+  #app-bug .module-num { font-size: 17px; color: #3d6fd8; font-weight: 700; }
+  #app-bug .module h2 { font-size: 22px; margin: 10px 0 8px; }
+  #app-bug .module p { font-size: 16px; line-height: 1.7; color: #748096; margin: 0; }
+  #app-bug .open-btn { margin-top: auto; width: 100%; border: 0; background: #3d6fd8; color: #fff; border-radius: 11px; padding: 12px; font-weight: 600; }
+  #app-bug .analysis-btn { position: absolute; right: 18px; top: 17px; border: 0; background: #f1f4f9; color: #66738a; border-radius: 18px; padding: 6px 10px; font-size: 12px; }
+  #app-bug .screen { display: none; max-width: 1100px; margin: 0 auto; }
+  #app-bug .screen.active { display: block; }
+  #app-bug .topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  #app-bug .back-home { border: 1px solid #dfe5ef; background: #fff; border-radius: 10px; padding: 9px 14px; color: #56647a; }
+  #app-bug .screen-title { font-size: 24px; font-weight: 700; }
+  #app-bug .card { background: #fff; border: 1px solid #dfe5ef; border-radius: 18px; box-shadow: 0 8px 24px rgba(45,62,90,.08); padding: 24px; }
+  #app-bug .instructions { background: #edf3ff; border-radius: 12px; padding: 14px 16px; line-height: 1.7; margin-bottom: 18px; }
+  #app-bug .footer-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+  #app-bug .primary { border: 0; background: #3d6fd8; color: #fff; border-radius: 10px; padding: 11px 22px; font-weight: 600; }
+  #app-bug .secondary { border: 1px solid #dfe5ef; background: #fff; color: #56647a; border-radius: 10px; padding: 11px 22px; }
+  #app-bug .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: #263247; color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 14px; opacity: 0; pointer-events: none; transition: .2s; }
+  #app-bug .toast.show { opacity: 1; }
+  #app-bug .match-area { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; position: relative; min-height: 410px; }
+  #app-bug .match-col { display: flex; flex-direction: column; gap: 13px; z-index: 2; }
+  #app-bug .match-item { background: #f8fafc; border: 2px solid #e1e6ef; border-radius: 12px; padding: 14px 18px; text-align: center; min-height: 52px; display: flex; align-items: center; justify-content: center; transition: .15s; }
+  #app-bug .match-item.selected { border-color: #3d6fd8; background: #edf3ff; }
+  #app-bug .match-item.matched { border-color: #79b58f; background: #dff3e6; color: #28734a; }
+  #app-bug #matchSvg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+  #app-bug .analysis-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  #app-bug .badge { font-size: 13px; padding: 7px 10px; border-radius: 8px; background: #f2f5fa; color: #66738a; }
+  #app-bug .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  #app-bug .word-analysis { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  #app-bug .word-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; }
+  #app-bug .word-cell { padding: 15px 12px; text-align: center; border-radius: 9px; background: #dff3e6; color: #28734a; font-size: 18px; }
+  #app-bug .word-row.error .word-cell { background: #fde4e4; color: #b44747; }
+  #app-bug .legend { font-size: 16px; color: #748096; margin-top: 16px; }
+  #app-bug .metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px; }
+  #app-bug .metric { padding: 22px 14px; border-radius: 12px; background: #f7f9fc; text-align: center; }
+  #app-bug .metric .label { font-size: 18px; color: #68758a; }
+  #app-bug .metric .value { font-size: 30px; font-weight: 700; margin-top: 7px; }
+  #app-bug .metric.warn .value { color: #b44747; }
+  #app-bug .students { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
+  #app-bug .student { border: 1px solid #dfe5ef; background: #f9fbfd; border-radius: 10px; padding: 16px 8px; text-align: center; color: #526077; font-size: 16px; }
+  #app-bug .student.problem { background: #fff0f0; border-color: #f3d1d1; color: #a64b4b; }
+  #app-bug .modal { position: fixed; inset: 0; background: rgba(30,40,58,.42); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 10; }
+  #app-bug .modal.show { display: flex; }
+  #app-bug .modal-box { background: #fff; border-radius: 16px; width: min(560px,92vw); padding: 24px; box-shadow: 0 18px 50px rgba(0,0,0,.18); position: relative; }
+  #app-bug .close { position: absolute; right: 14px; top: 12px; border: 0; background: transparent; font-size: 25px; color: #7c8798; }
+  #app-bug .answer-box { margin-top: 16px; background: #f7f9fc; border-radius: 11px; padding: 17px; line-height: 2; }
+  #app-bug textarea { width: 100%; min-height: 240px; border: 2px solid #dfe5ef; border-radius: 12px; padding: 16px; resize: vertical; outline: none; line-height: 1.8; }
+  #app-bug textarea:focus { border-color: #3d6fd8; }
+  #app-bug .choice-list { display: flex; flex-direction: column; gap: 13px; max-width: 600px; margin: 22px auto; }
+  #app-bug .choice { border: 2px solid #e0e5ee; background: #fafbfd; border-radius: 12px; padding: 16px; text-align: center; font-size: 17px; }
+  #app-bug .choice.selected { border-color: #3d6fd8; background: #edf3ff; }
+  #app-bug .chart-wrap { display: grid; grid-template-columns: 300px 1fr; gap: 30px; align-items: center; }
+  #app-bug .pie { width: 260px; height: 260px; border-radius: 50%; margin: auto; background: conic-gradient(#3d6fd8 0 60%,#7e9fe4 60% 95%,#d8a0a0 95% 100%); position: relative; }
+  #app-bug .pie:after { content: ""; position: absolute; inset: 58px; background: #fff; border-radius: 50%; }
+  #app-bug .chart-legend { display: flex; flex-direction: column; gap: 13px; font-size: 18px; }
+  #app-bug .legend-row { display: flex; align-items: center; gap: 9px; }
+  #app-bug .dot { width: 13px; height: 13px; border-radius: 50%; display: inline-block; }
+  #app-bug .correct-answer { font-size: 23px; font-weight: 700; color: #3d6fd8; background: #edf3ff; padding: 10px 15px; border-radius: 10px; }
+  @media (max-width: 900px) { #app-bug .app { padding: 22px 20px; } #app-bug .modules { grid-template-columns: 1fr; } #app-bug .module { min-height: 160px; } #app-bug .students { grid-template-columns: repeat(4,1fr); } #app-bug .analysis-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 650px) { #app-bug h1 { font-size: 24px; } #app-bug .screen-title { font-size: 20px; } #app-bug .match-area { gap: 18px; } #app-bug .students { grid-template-columns: repeat(3,1fr); } #app-bug .chart-wrap { grid-template-columns: 1fr; } #app-bug .pie { width: 210px; height: 210px; } #app-bug .pie:after { inset: 47px; } }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-
-  <!-- ================= 导航页（默认显示） ================= -->
-  <div id="page-nav">
-    <div class="nav-title">请选择进入的端</div>
-    <div class="nav-grid">
-      <!-- 点击学生端，执行 showStudent() -->
-      <div class="nav-btn" onclick="showStudent()">学生端</div>
-      <!-- 其他端暂时为不可点击状态 -->
-      <div class="nav-btn disabled">教师端（敬请期待）</div>
-      <div class="nav-btn disabled">运营端（敬请期待）</div>
-      <div class="nav-btn disabled">管理员端（敬请期待）</div>
-    </div>
+<!-- ==================== 导航页 ==================== -->
+<div id="page-nav" class="app-page active">
+  <h1>请选择进入的端</h1>
+  <div class="nav-grid">
+    <button class="nav-btn ai" onclick="switchPage('app-ai')">AI 评价（日语）</button>
+    <button class="nav-btn info" onclick="switchPage('app-info')">限时活动信息提取</button>
+    <button class="nav-btn oral" onclick="switchPage('app-oral')">玩家咨询口头应答</button>
+    <button class="nav-btn bug" onclick="switchPage('app-bug')">Bug 报告填写</button>
   </div>
+</div>
 
-  <!-- ================= 答题页（默认隐藏） ================= -->
-  <div id="page-student">
-    <!-- 返回按钮 -->
-    <button class="back-btn" onclick="goBack()">← 返回首页</button>
-
+<!-- ==================== 页面1：AI 评价 ==================== -->
+<div id="app-ai" class="app-page">
+  <div class="wrap">
+    <button onclick="switchPage('page-nav')" style="padding: 10px 20px; background: #e8e3d6; color: #5f5a4f; border: none; border-radius: 9px; cursor: pointer; font-weight: bold; width: fit-content;">← 返回首页</button>
     <section class="panel question-panel">
       <h2 class="panel-title">プレイヤー質問</h2>
-      <p class="question-text">
-        雲菫の衣装や歌い方は歌舞伎に少し似ています。どのような文化をもとにしているんですか。
-      </p>
+      <p class="question-text">雲菫の衣装や歌い方は歌舞伎に少し似ています。どのような文化をもとにしているんですか。</p>
     </section>
-
-    <section class="panel" style="margin-top: 20px;">
+    <section class="panel">
       <h2 class="panel-title">運営人員回答</h2>
-
       <div id="inputArea">
         <textarea id="answer" maxlength="1000" placeholder="ここに回答を入力してください…"></textarea>
         <div class="footer">
           <span class="counter" id="counter">0 文字</span>
-          <button class="submit-btn" id="submitBtn">送信</button>
+          <button id="submitBtn">送信</button>
         </div>
       </div>
-
       <div class="loading" id="loading">
         <div class="spinner"></div>
         <div class="loading-text">AIが回答を評価しています…</div>
       </div>
-
       <div class="result" id="result">
         <div class="result-title">AI 评价结果</div>
-        <div class="dim">
-          <div class="dim-head"><span class="dim-name">日语语言运用</span><span class="dim-score" id="score0">0</span></div>
-          <div class="dim-bar"><span id="bar0"></span></div><div class="dim-feedback" id="fb0"></div>
-        </div>
-        <div class="dim">
-          <div class="dim-head"><span class="dim-name">温和澄清来源</span><span class="dim-score" id="score1">0</span></div>
-          <div class="dim-bar"><span id="bar1"></span></div><div class="dim-feedback" id="fb1"></div>
-        </div>
-        <div class="dim">
-          <div class="dim-head"><span class="dim-name">承接玩家观察</span><span class="dim-score" id="score2">0</span></div>
-          <div class="dim-bar"><span id="bar2"></span></div><div class="dim-feedback" id="fb2"></div>
-        </div>
-        <div class="dim">
-          <div class="dim-head"><span class="dim-name">鼓励继续交流</span><span class="dim-score" id="score3">0</span></div>
-          <div class="dim-bar"><span id="bar3"></span></div><div class="dim-feedback" id="fb3"></div>
-        </div>
+        <div class="dim"><div class="dim-head"><span class="dim-name">日语语言运用</span><span class="dim-score" id="score0">0</span></div><div class="dim-bar"><span id="bar0"></span></div><div class="dim-feedback" id="fb0"></div></div>
+        <div class="dim"><div class="dim-head"><span class="dim-name">温和澄清来源</span><span class="dim-score" id="score1">0</span></div><div class="dim-bar"><span id="bar1"></span></div><div class="dim-feedback" id="fb1"></div></div>
+        <div class="dim"><div class="dim-head"><span class="dim-name">承接玩家观察</span><span class="dim-score" id="score2">0</span></div><div class="dim-bar"><span id="bar2"></span></div><div class="dim-feedback" id="fb2"></div></div>
+        <div class="dim"><div class="dim-head"><span class="dim-name">鼓励继续交流</span><span class="dim-score" id="score3">0</span></div><div class="dim-bar"><span id="bar3"></span></div><div class="dim-feedback" id="fb3"></div></div>
         <div class="fav-box">
           <div class="fav-head"><span class="fav-label">玩家好感度</span><span class="fav-value" id="favValue">0%</span></div>
           <div class="fav-bar"><span id="favBar"></span></div><div class="fav-note" id="favNote"></div>
@@ -273,173 +307,233 @@
           <div class="decision-btn yellow" id="decYellow">修改后发布</div>
           <div class="decision-btn green" id="decGreen">可以发布</div>
         </div>
-        <div class="actions">
-          <button class="btn-secondary" id="retryBtn">もう一度書く</button>
-        </div>
+        <div class="actions"><button class="btn-secondary" id="retryBtn">もう一度書く</button></div>
       </div>
     </section>
   </div>
-
+  <div id="toast"></div>
 </div>
 
-<div id="toast"></div>
+<!-- ==================== 页面2：信息提取 ==================== -->
+<div id="app-info" class="app-page">
+  <main>
+    <header class="top">
+      <button class="back-home" onclick="switchPage('page-nav')" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #ccc; background: white; cursor: pointer;">← 返回首页</button>
+      <h1>限时活动 · 信息提取练习</h1>
+      <span class="tag" lang="ja">活動情報カード</span>
+    </header>
+    <section class="announcement" aria-label="活动公告" lang="ja">
+      <div class="announcement-label">期間限定イベントのお知らせ</div>
+      <h2>イベント名：楽しい夏を！</h2>
+      <p>「楽しい夏を！」イベントは、2026年7月15日12:00から7月28日午後4時まで開催されます。冒険ランク1以上の旅人が参加でき、報酬として原石を獲得できます。ゲーム内報酬はメールにて配布され、メールの有効期限は30日間ですので、お早めにお受け取りください。</p>
+    </section>
+    <section class="card" aria-labelledby="formTitle">
+      <h2 id="formTitle">阅读公告，填写活动信息卡</h2>
+      <p class="hint">请依据公告填写，注意日期、时间和条件。支持日语或中文作答。</p>
+      <form id="answerForm">
+        <table>
+          <thead><tr><th scope="col" lang="ja">項目</th><th scope="col" lang="ja">内容</th></tr></thead>
+          <tbody>
+            <tr><td><label for="event" lang="ja">イベント名</label></td><td><input id="event" name="event" type="text" maxlength="200" required autocomplete="off" aria-label="活动名称"></td></tr>
+            <tr><td><label for="start" lang="ja">開始日時</label></td><td><input id="start" name="start" type="text" maxlength="200" required autocomplete="off" aria-label="开始时间"></td></tr>
+            <tr><td><label for="end" lang="ja">終了日時</label></td><td><input id="end" name="end" type="text" maxlength="200" required autocomplete="off" aria-label="结束时间"></td></tr>
+            <tr><td><label for="condition" lang="ja">参加条件</label></td><td><input id="condition" name="condition" type="text" maxlength="200" required autocomplete="off" aria-label="参加条件"></td></tr>
+            <tr><td><label for="reward" lang="ja">報酬内容</label></td><td><input id="reward" name="reward" type="text" maxlength="200" required autocomplete="off" aria-label="奖励内容"></td></tr>
+            <tr><td><label for="notice" lang="ja">注意事項<br>（受取方法・メールの有効期限）</label></td><td><textarea id="notice" name="notice" rows="2" maxlength="500" required aria-label="领取方式与邮件有效期限"></textarea></td></tr>
+          </tbody>
+        </table>
+        <button class="submit" id="submitBtn" type="submit">提交 · 查看AI诊断</button>
+        <p id="status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+    <section id="result" class="card" hidden aria-labelledby="resultTitle">
+      <div class="result-head">
+        <div class="score"><strong id="scoreValue">0</strong><span>总分 / 100</span></div>
+        <div><h2 id="resultTitle">AI诊断 <span class="tag">规则模拟</span></h2><p id="summary"></p></div>
+      </div>
+      <div id="details"></div>
+      <p class="note">采用鼓励性评分，兼容常见日期格式及同义表达，轻微遗漏少扣分。当前为本地规则模拟，未连接AI服务；复杂表述请由教师复核。答案仅在当前页面处理，不会发送或保存到教师后台。</p>
+      <button class="secondary" type="button" id="editBtn">返回修改，再次提交</button>
+    </section>
+  </main>
+</div>
+
+<!-- ==================== 页面3：口头应答 ==================== -->
+<div id="app-oral" class="app-page">
+  <main>
+    <header>
+      <button onclick="switchPage('page-nav')" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #ccdeed; background: white; cursor: pointer; font-size: 16px;">← 返回首页</button>
+      <h1>玩家咨询</h1>
+      <span class="badge" id="step">第1题 / 共6题</span>
+    </header>
+    <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+    <section class="card" id="practice">
+      <div class="player">
+        <div class="avatar" aria-hidden="true">P</div>
+        <span>プレイヤーからの質問</span>
+      </div>
+      <div class="question-box" aria-live="polite"><p id="question" lang="ja"></p></div>
+      <div class="record-area">
+        <span class="badge" id="modeBadge">麦克风录音</span>
+        <div class="waves" id="waves" aria-hidden="true"><span style="--i:1"></span><span style="--i:2"></span><span style="--i:3"></span><span style="--i:4"></span><span style="--i:5"></span><span style="--i:6"></span><span style="--i:7"></span><span style="--i:8"></span><span style="--i:9"></span><span style="--i:10"></span><span style="--i:11"></span></div>
+        <div class="timer" id="timer">00:00</div>
+        <button class="record-btn" id="recordBtn" type="button"><span class="record-icon" aria-hidden="true"></span><span id="recordLabel">点击开始录音</span></button>
+        <p id="status" role="status" aria-live="polite"></p>
+        <audio id="playback" controls hidden></audio>
+      </div>
+      <nav class="navigation" aria-label="题目切换">
+        <button class="secondary" id="previous" type="button">上一题</button>
+        <button class="primary" id="next" type="button">下一题</button>
+      </nav>
+      <details id="settings">
+        <summary>录音模式</summary>
+        <div class="mode-buttons">
+          <button class="secondary" id="realMode" type="button" aria-pressed="true">麦克风录音</button>
+          <button class="secondary" id="demoMode" type="button" aria-pressed="false">模拟录音效果</button>
+        </div>
+      </details>
+    </section>
+    <section class="card" id="finished" hidden>
+      <h2>本轮咨询结束</h2>
+      <p id="completionText"></p>
+      <button class="primary" id="restart" type="button">返回第一题复习</button>
+    </section>
+  </main>
+</div>
+
+<!-- ==================== 页面4：Bug报告 ==================== -->
+<div id="app-bug" class="app-page">
+  <div class="app">
+    <div id="home" class="screen active">
+      <div class="header">
+        <button onclick="switchPage('page-nav')" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #dfe5ef; background: white; cursor: pointer; margin-bottom: 20px;">← 返回首页</button>
+        <h1>日语Bug报告的填写</h1>
+      </div>
+      <div class="modules">
+        <div class="module"><button class="analysis-btn" onclick="showScreen('analysis1')">📊 作答分析</button><div class="module-num">01</div><h2>游戏操作词汇配对</h2><p>将中文游戏操作与对应的日语表达进行配对。</p><button class="open-btn" onclick="showScreen('student1')">开始作答</button></div>
+        <div class="module"><button class="analysis-btn" onclick="showScreen('analysis2')">📊 作答分析</button><div class="module-num">02</div><h2>填写「再現手順」</h2><p>将游戏 Bug 的再现步骤整理并翻译成日语。</p><button class="open-btn" onclick="showScreen('student2')">开始作答</button></div>
+        <div class="module"><button class="analysis-btn" onclick="showScreen('analysis3')">📊 作答分析</button><div class="module-num">03</div><h2>接续词选择</h2><p>选择适合 Bug 报告书面表达的连接形式。</p><button class="open-btn" onclick="showScreen('student3')">开始作答</button></div>
+      </div>
+    </div>
+    <div id="student1" class="screen">
+      <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">游戏操作词汇配对</div></div>
+      <div class="card"><div class="instructions">请点击左侧中文词汇，再点击右侧对应的日语表达，完成全部配对。</div><div class="match-area" id="matchArea"><svg id="matchSvg"></svg><div class="match-col" id="cnCol"></div><div class="match-col" id="jpCol"></div></div><div class="footer-actions"><button class="primary" onclick="submitMatch()">提交答案</button></div></div>
+    </div>
+    <div id="analysis1" class="screen">
+      <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">游戏操作词汇配对 · 作答分析</div></div>
+      <div class="card"><div class="analysis-head"><strong>班级作答情况</strong></div><div class="word-analysis"><div class="word-row error"><div class="word-cell">点击</div><div class="word-cell">クリックする</div></div><div class="word-row"><div class="word-cell">滑动</div><div class="word-cell">スワイプする</div></div><div class="word-row error"><div class="word-cell">轻触</div><div class="word-cell">タップする</div></div><div class="word-row"><div class="word-cell">拖动</div><div class="word-cell">ドラッグする</div></div><div class="word-row"><div class="word-cell">输入</div><div class="word-cell">入力する</div></div><div class="word-row"><div class="word-cell">启动</div><div class="word-cell">起動する</div></div><div class="word-row"><div class="word-cell">滚动</div><div class="word-cell">スクロールする</div></div><div class="word-row"><div class="word-cell">放大</div><div class="word-cell">拡大する</div></div></div><div class="legend">绿色：掌握较好　　红色：错误率较高</div></div>
+    </div>
+    <div id="student2" class="screen">
+      <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">填写「再現手順」</div></div>
+      <div class="card"><div class="instructions">请将以下游戏 Bug 的再现步骤翻译成日语。<br>① 游戏启动　　② 点击「活动」　　③ 打开活动页面</div><textarea id="answer2" placeholder="请输入日语再現手順……"></textarea><div class="footer-actions"><button class="primary" onclick="submitText()">提交答案</button></div></div>
+    </div>
+    <div id="analysis2" class="screen">
+      <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">填写「再現手順」 · 作答分析</div></div>
+      <div class="card"><div class="analysis-head"><strong>AI对班级回答的总体诊断</strong></div><div class="metrics"><div class="metric"><div class="label">词汇准确度</div><div class="value">✓</div></div><div class="metric"><div class="label">语法准确度</div><div class="value">✓</div></div><div class="metric warn"><div class="label">文体恰当性</div><div class="value">△</div></div></div><h3>学生回答</h3><div class="students" id="students"></div></div>
+    </div>
+    <div id="student3" class="screen">
+      <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">接续词选择</div></div>
+      <div class="card"><div class="instructions" style="text-align:center;font-size:18px">読み込みが完了<span style="text-decoration:underline">___________</span>、イベント画面が表示されない。</div><div class="choice-list"><button class="choice" onclick="choose3(this,'しなくて')">しなくて</button><button class="choice" onclick="choose3(this,'ないで')">ないで</button><button class="choice" onclick="choose3(this,'せず')">せず</button></div><div class="footer-actions"><button class="primary" onclick="submitChoice()">提交答案</button></div></div>
+    </div>
+    <div id="analysis3" class="screen">
+      <div class="topbar"><button class="back-home" onclick="showScreen('home')">← 返回主界面</button><div class="screen-title">接续词选择 · 作答分析</div></div>
+      <div class="card"><div class="analysis-head"><strong>班级作答情况</strong><span class="correct-answer">正确答案：せず</span></div><div class="chart-wrap"><div class="pie" aria-label="饼状图"></div><div class="chart-legend"><div class="legend-row"><span class="dot" style="background:#3d6fd8"></span><strong>せず　12人（60%）</strong></div><div class="legend-row"><span class="dot" style="background:#7e9fe4"></span><strong>しなくて　7人（35%）</strong></div><div class="legend-row"><span class="dot" style="background:#d8a0a0"></span><strong>ないで　1人（5%）</strong></div></div></div></div>
+    </div>
+  </div>
+  <div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="modal-box"><button class="close" onclick="closeModal()">×</button><h3 id="modalTitle">学生回答</h3><div class="answer-box" id="modalAnswer"></div></div></div>
+  <div id="toast" class="toast"></div>
+</div>
 
 <script>
-  // ==================== 页面切换逻辑 ====================
-  function showStudent() {
-    document.getElementById('page-nav').style.display = 'none';
-    document.getElementById('page-student').style.display = 'block';
+  // ==================== 页面切换核心逻辑 ====================
+  function switchPage(pageId) {
+    document.querySelectorAll('.app-page').forEach(page => {
+      page.classList.remove('active');
+    });
+    document.getElementById(pageId).classList.add('active');
+    window.scrollTo(0, 0);
+    document.body.style.background = ''; // 重置背景
+    if(pageId === 'app-info') document.body.style.background = '#edf5fc';
+    if(pageId === 'app-oral') document.body.style.background = '#eef5fb';
+    if(pageId === 'app-bug') document.body.style.background = '#f5f7fb';
   }
 
-  function goBack() {
-    document.getElementById('page-student').style.display = 'none';
-    document.getElementById('page-nav').style.display = 'block';
-    // 返回时重置学生端的状态
-    document.getElementById('inputArea').style.display = 'block';
-    document.getElementById('result').classList.remove('show');
-    document.getElementById('answer').value = '';
-    document.getElementById('counter').textContent = '0 文字';
-  }
+  // ==================== 页面1：AI 评价逻辑 ====================
+  (function() {
+    var ta=document.getElementById('answer'),counter=document.getElementById('counter'),btn=document.getElementById('submitBtn'),toast=document.getElementById('toast'),inputArea=document.getElementById('inputArea'),loading=document.getElementById('loading'),result=document.getElementById('result'),retryBtn=document.getElementById('retryBtn');
+    if(!ta) return;
+    ta.addEventListener('input',function(){counter.textContent=ta.value.length+' 文字';});
+    var timer;
+    function showToast(msg,isError){toast.textContent=msg;toast.className='show'+(isError?' error':'');clearTimeout(timer);timer=setTimeout(function(){toast.className='';},2200);}
+    function submit(){var text=ta.value.trim();if(!text){showToast('回答を入力してください',true);ta.focus();return;}inputArea.style.display='none';result.classList.remove('show');loading.classList.add('show');setTimeout(function(){loading.classList.remove('show');var ev=evaluate(text);render(ev);result.classList.add('show');},1400);}
+    btn.addEventListener('click',submit);
+    ta.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='Enter')submit();});
+    retryBtn.addEventListener('click',function(){result.classList.remove('show');inputArea.style.display='block';ta.focus();});
+    function evaluate(text){var len=text.length;var jp=88;var jpNotes=[];var keigoHits=(text.match(/です|ます|ございます|いたします|申し上げます|おります|ではありません/g)||[]).length;if(keigoHits>=2){jp+=10;jpNotes.push('<span class="good">✅ 敬体稳定，文体得体。</span>');}else if(keigoHits>=1){jp+=5;jpNotes.push('<span class="good">✅ 使用了敬体。</span>');}else{jp-=12;jpNotes.push('<span class="warn">⚠️ 敬体不足，建议统一为「です・ます」体。</span>');}var casual=(text.match(/だ。|だ！|する。|した。|である。/g)||[]).length;if(casual>0){jp-=12*casual;jpNotes.push('<span class="bad">❌ 混入常体，应统一为敬体。</span>');}if(len<40){jp-=8;jpNotes.push('<span class="warn">⚠️ 句子太短，建议2～3句说明。</span>');}else if(len>400){jp-=4;jpNotes.push('<span class="warn">⚠️ 篇幅偏长，注意可读性。</span>');}jp=clamp(jp,60,100);var jpSuggest='';if(jp>=95){jpSuggest='日语表达基本没有问题，无需修改。';}else if(casual>0){jpSuggest='把常体统一为敬体。';}else{jpSuggest='统一使用「です・ます」体。';}
+    var clarify=40;var clarifyNotes=[];if(/京劇|中国の伝統|中国伝統|戯曲|伝統演劇/.test(text)){clarify+=25;clarifyNotes.push('<span class="good">✅ 正确指出中国京剧・传统戏剧。</span>');}else{clarifyNotes.push('<span class="bad">❌ 未明示文化来源，应写「中国の伝統演劇、特に京劇」。</span>');}var harsh=(text.match(/違います|間違|ではありません|じゃない/g)||[]).length;var soft=/確かに|おっしゃる通り|ご指摘|なるほど|実は/.test(text);if(harsh>=1&&!soft){clarify-=10;clarifyNotes.push('<span class="warn">⚠️ 直接否定太生硬，应先认同再纠正。</span>');}else if(harsh>=1&&soft){clarifyNotes.push('<span class="good">✅ 否定时也尊重了对方观点。</span>');}else if(!harsh){clarify+=15;clarifyNotes.push('<span class="good">✅ 未使用生硬否定，表达温和。</span>');}if(/ではありません|です|ます/.test(text)){clarify+=15;clarifyNotes.push('<span class="good">✅ 用敬体礼貌传达。</span>');}clarify=clamp(clarify,20,100);var clarifySuggest='';if(clarify>=90){clarifySuggest='来源说明与语气都没有问题。';}else if(harsh>=1&&!soft){clarifySuggest='把「それは違います」换成「実は〜なんです」。';}else{clarifySuggest='明确写出「中国の伝統演劇、特に京劇」。';}
+    var receive=25;var receiveNotes=[];if(/歌舞伎/.test(text)){receive+=20;receiveNotes.push('<span class="good">✅ 提到了玩家说的「歌舞伎」。</span>');}else{receiveNotes.push('<span class="bad">❌ 未回应玩家「像歌舞伎」的观察。</span>');}if(/似|共通|近い|思われる|感じ/.test(text)){receive+=15;receiveNotes.push('<span class="good">✅ 触及了相似点。</span>');}else{receiveNotes.push('<span class="warn">⚠️ 应先说「確かに似ている部分もあります」。</span>');}if(/確かに|おっしゃる通り|ご指摘|なるほど/.test(text)){receive+=25;receiveNotes.push('<span class="good">✅ 有「確かに」等认同表达。</span>');}else{receiveNotes.push('<span class="bad">❌ 缺少「確かに」等先认同的表达。</span>');}receive=clamp(receive,10,100);var receiveSuggest='';if(receive>=80){receiveSuggest='能好好接住玩家的观察。';}else{receiveSuggest='开头加一句「確かに歌舞伎と似ている部分もありますね」。';}
+    var encourage=25;var encourageNotes=[];if(/ぜひ|お気軽|いつでも|質問|聞かせて|教えて|楽しんで/.test(text)){encourage+=30;encourageNotes.push('<span class="good">✅ 有邀请继续对话的表达。</span>');}else{encourageNotes.push('<span class="bad">❌ 缺少「ぜひお気軽にご質問ください」等邀请。</span>');}if(/ありがとう|感謝|うれしい|嬉しい/.test(text)){encourage+=20;encourageNotes.push('<span class="good">✅ 表达了感谢。</span>');}else{encourageNotes.push('<span class="warn">⚠️ 加一句「ご関心ありがとうございます」。</span>');}if(/応援|一緒に|これからも|よろしく/.test(text)){encourage+=15;encourageNotes.push('<span class="good">✅ 有面向未来的表达。</span>');}else{encourageNotes.push('<span class="warn">⚠️ 加一句「これからも〜を楽しんでください」。</span>');}encourage=clamp(encourage,10,100);var encourageSuggest='';if(encourage>=80){encourageSuggest='有继续对话的姿态。';}else{encourageSuggest='结尾加「ぜひお気軽にご質問ください」。';}
+    var scores=[jp,clarify,receive,encourage];var min=Math.min.apply(null,scores);var level;if(min>=75){level='green';}else if(min>=25){level='yellow';}else{level='red';}
+    var fav=Math.round(receive*0.35+encourage*0.30+clarify*0.25+jp*0.10);fav=clamp(fav,0,100);var favLevel,favNote;if(fav>=75){favLevel='green';favNote='<span class="em">玩家抱有好感。</span>请继续保持这种温和、有回应的沟通方式。';}else if(fav>=50){favLevel='yellow';favNote='<span class="em">玩家略感不满。</span>日语虽然准确，但缺少「承接玩家观察」和「邀请继续交流」两句话，好感度会被拉低。';}else{favLevel='red';favNote='<span class="em">玩家容易产生不满。</span>仅有正确日语不够，先认同玩家的观察，再在结尾邀请继续交流，好感度才会上升。';}
+    return {dims:[{score:jp,notes:jpNotes,suggest:jpSuggest},{score:clarify,notes:clarifyNotes,suggest:clarifySuggest},{score:receive,notes:receiveNotes,suggest:receiveSuggest},{score:encourage,notes:encourageNotes,suggest:encourageSuggest}],level:level,fav:fav,favLevel:favLevel,favNote:favNote};}
+    function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+    function render(ev){for(var i=0;i<4;i++){var d=ev.dims[i];var scoreEl=document.getElementById('score'+i);var barEl=document.getElementById('bar'+i);var fbEl=document.getElementById('fb'+i);scoreEl.textContent=d.score;scoreEl.className='dim-score'+(d.score<40?' critical':d.score<70?' low':'');barEl.className=d.score<40?'critical':d.score<70?'low':'';(function(el,sc){setTimeout(function(){el.style.width=sc+'%';},60);})(barEl,d.score);var html='';d.notes.forEach(function(n){html+=n+'<br>';});html+='<span style="color:#8a6d2f;margin-top:6px;display:inline-block;">建议：'+d.suggest+'</span>';fbEl.innerHTML=html;}
+    var favValEl=document.getElementById('favValue');var favBarEl=document.getElementById('favBar');var favNoteEl=document.getElementById('favNote');favValEl.textContent=ev.fav+'%';favValEl.className='fav-value '+ev.favLevel;favBarEl.className=ev.favLevel;(function(el,sc){setTimeout(function(){el.style.width=sc+'%';},120);})(favBarEl,ev.fav);favNoteEl.innerHTML=ev.favNote;
+    document.getElementById('decRed').classList.remove('active');document.getElementById('decYellow').classList.remove('active');document.getElementById('decGreen').classList.remove('active');if(ev.level==='red')document.getElementById('decRed').classList.add('active');if(ev.level==='yellow')document.getElementById('decYellow').classList.add('active');if(ev.level==='green')document.getElementById('decGreen').classList.add('active');}
+  })();
 
-  // ==================== 原本的 AI 评价逻辑 ====================
-  var ta=document.getElementById('answer'),counter=document.getElementById('counter'),btn=document.getElementById('submitBtn'),toast=document.getElementById('toast'),inputArea=document.getElementById('inputArea'),loading=document.getElementById('loading'),result=document.getElementById('result'),retryBtn=document.getElementById('retryBtn');
-  
-  ta.addEventListener('input',function(){counter.textContent=ta.value.length+' 文字';});
-  
-  var timer;
-  function showToast(msg,isError){
-    toast.textContent=msg;
-    toast.className='show'+(isError?' error':'');
-    clearTimeout(timer);
-    timer=setTimeout(function(){toast.className='';},2200);
-  }
-  
-  function submit(){
-    var text=ta.value.trim();
-    if(!text){showToast('回答を入力してください',true);ta.focus();return;}
-    inputArea.style.display='none';
-    result.classList.remove('show');
-    loading.classList.add('show');
-    setTimeout(function(){
-      loading.classList.remove('show');
-      var ev=evaluate(text);
-      render(ev);
-      result.classList.add('show');
-    },1400);
-  }
-  
-  btn.addEventListener('click',submit);
-  ta.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='Enter')submit();});
-  
-  retryBtn.addEventListener('click',function(){
-    result.classList.remove('show');
-    inputArea.style.display='block';
-    ta.focus();
-  });
+  // ==================== 页面2：信息提取逻辑 ====================
+  (function() {
+    const $ = id => document.getElementById(id);
+    if(!$('answerForm')) return;
+    const ids = ["event","start","end","condition","reward","notice"];
+    const labels = ["イベント名","開始日時","終了日時","参加条件","報酬内容","注意事項"];
+    const references = ["楽しい夏を！","2026年7月15日12:00","2026年7月28日午後4時（16:00）","冒険ランク1以上，即冒险等级1及以上，包括等级1。","原石","通过游戏内邮件发放；邮件有效期限为30天，请及时领取。"];
+    let lastResults = [];
+    function normalize(text) { return text.normalize("NFKC").toLowerCase().replace(/\s+/g, "").replace(/點/g, "点").replace(/時/g, "时").replace(/級/g, "级").replace(/郵件/g, "邮件").replace(/郵箱/g, "邮箱"); }
+    function scrollToElement(element) { const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches; element.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" }); }
+    function dateCheck(text, expectedDay, isEnd) { const t = normalize(text); const datePattern = new RegExp("(?:^|[^0-9])0?7(?:月|[/.\\-])0?" + expectedDay + "(?![0-9])(?:日|号)?"); const dateOK = datePattern.test(t); const years = t.match(/20\d{2}/g) || []; const yearOK = years.every(year => year === "2026"); let timeOK = false; let explicitWrongTime = false; if (isEnd) { const time24 = /(?:^|[^\d])16(?::00(?!\d)|(?:时|点)(?!\d))/.test(t); const afternoon = /(?:午後|下午)0?4(?::00(?!\d)|(?:时|点)(?!\d))/.test(t); const pm = /(?:^|[^\d])0?4(?::00)?p\.?m\.?/.test(t); timeOK = time24 || afternoon || pm; if (/(?:午前|上午|凌晨)/.test(t)) { timeOK = false; explicitWrongTime = true; } } else { timeOK = /(?:^|[^\d])12(?::00(?!\d)|(?:时|点)(?!\d))/.test(t); if (/(?:深夜|凌晨|午夜|夜中|午前12|12(?::00)?a\.?m)/.test(t)) { timeOK = false; explicitWrongTime = true; } } const clockMatches = [...t.matchAll(/(\d{1,2})(?::|时|点)(\d{1,2})(?:分)?/g)]; if (clockMatches.some(match => Number(match[2]) !== 0)) { timeOK = false; explicitWrongTime = true; } if (dateOK && timeOK && yearOK) { return { score: 100, message: "日期与具体时间提取准确，表达清楚。" }; } if (dateOK && timeOK && !yearOK) { return { score: 88, message: "月日与时刻正确，请核对年份，应为2026年。" }; } if (dateOK) { return { score: explicitWrongTime ? 75 : 85, message: isEnd ? "结束日期已找对，请核对具体时刻，完整写出“午後4時”或“16:00”。" : "开始日期已找对，请补充或核对“12:00”，即中午12点。" }; } if (timeOK) { return { score: 65, message: "已识别到正确时刻，请继续核对对应的活动日期。" }; } return { score: 25, message: "已完成填写，请回到公告的活动时间句，重新核对日期和时刻。" }; }
+    function evaluate(values) { const t = values.map(normalize); const results = []; const fullName = t[0].includes("楽しい夏を"); const partialName = t[0].includes("楽しい夏"); results.push({ score: fullName ? 100 : partialName ? 92 : 25, message: fullName ? "活动名称准确，标点差异不扣分。" : partialName ? "名称主体已经找对，请补全“を”。" : "请核对标题中的活动名称，并保留活动原名。" }); results.push(dateCheck(values[1], 15, false)); results.push(dateCheck(values[2], 28, true)); const condition = t[3]; const levelOne = /(?:^|[^\d])1(?!\d)/.test(condition); const inclusive = /1(?:级)?以上|(?:≥|>=)1|(?:不低于|至少|大于等于)1|1(?:级)?(?:及以上|或以上)/.test(condition); const contradiction = /高于1|超过1|大于1(?!等于)|不包括1|不含1|1(?:级)?(?:不能|不可)|1より上|1を超|1は参加できません|1は参加できない|1を含まない/.test(condition); results.push({ score: contradiction ? 45 : inclusive ? 100 : levelOne ? 88 : 25, message: contradiction ? "“1以上”包括等级1，请修正排除等级1的表述。" : inclusive ? "准确提取等级门槛，并保留了“包括1”的范围。" : levelOne ? "已经找到等级1，请补充“以上”，明确参加范围。" : "请核对参加条件，应为冒险等级1及以上。" }); const rewardOK = /原石|primogem/.test(t[4]); const inventedAmount = /\d|百|千|万/.test(t[4]); const rewardNegated = /没有原石|不是原石|無原石|原石ではない|原石はもらえない|原石を獲得できない/.test(t[4]); results.push({ score: rewardNegated ? 25 : rewardOK ? inventedAmount ? 85 : 100 : 25, message: rewardNegated ? "公告明确写明奖励为原石，请核对并修正否定表述。" : rewardOK ? inventedAmount ? "奖励种类正确，但公告未写明数量，请不要自行补充。" : "奖励内容准确，没有添加公告以外的信息。" : "请查看公告中的“報酬として”，核对奖励种类。" }); const notice = t[5]; const mail = /メール|邮件|邮箱|mail/.test(notice); const thirtyDays = /(?:30|三十)(?:日間|日|天)/.test(notice); const wrongPeriod = /活动(?:持续|时间|期限)(?:为|是)?30|イベント(?:の)?(?:期間|開催期間)(?:は)?30/.test(notice); const mailNegated = /不(?:是|通过|用)(?:游戏内)?邮件|メールでは(?:ない|ありません)|メールで受け取れない/.test(notice); results.push({ score: wrongPeriod || mailNegated ? 60 : mail && thirtyDays ? 100 : mail || thirtyDays ? 85 : 25, message: wrongPeriod ? "请区分活动时间和邮件期限：30天指邮件有效期限。" : mailNegated ? "公告说明奖励通过游戏内邮件发放，请核对领取方式。" : mail && thirtyDays ? "领取方式和邮件期限均已提取，关键信息完整。" : mail ? "领取方式已找对，请补充邮件有效期限为30天。" : thirtyDays ? "已找到30天，请说明这是邮件有效期限，并补充游戏内邮件领取方式。" : "请补充领取方式与邮件有效期限这两项信息。" }); return results; }
+    function renderResults(results) { lastResults = results; const score = Math.round(results.reduce((sum, item) => sum + item.score, 0) / results.length); $("scoreValue").textContent = score; if (score >= 95) { $("summary").textContent = "完成得很好！关键规则提取准确，可以进入口头咨询练习。"; } else if (score >= 85) { $("summary").textContent = "整体掌握得不错！再核对下面几处细节，信息就更完整了。"; } else if (score >= 60) { $("summary").textContent = "已找到部分关键信息。请根据提示修改，再次提交。"; } else { $("summary").textContent = "已完成首次尝试。请结合提示重新阅读公告，逐项核对。"; } $("details").replaceChildren(); results.forEach((item, index) => { const box = document.createElement("div"); box.className = "diagnosis" + (item.score < 100 ? " review" : ""); const heading = document.createElement("div"); heading.className = "item-title"; const title = document.createElement("strong"); title.textContent = labels[index]; const badge = document.createElement("span"); badge.textContent = item.score === 100 ? "准确" : "建议核对"; heading.append(title, badge); const feedback = document.createElement("p"); feedback.textContent = item.message; box.append(heading, feedback); if (item.score < 100) { const reference = document.createElement("p"); reference.className = "reference"; reference.textContent = "参考信息：" + references[index]; box.append(reference); } $("details").append(box); }); $("result").hidden = false; scrollToElement($("result")); }
+    $("answerForm").addEventListener("submit", function(event) { event.preventDefault(); const values = ids.map(id => $(id).value.trim()); const blankIndex = values.findIndex(value => !value); if (blankIndex !== -1) { $(ids[blankIndex]).focus(); $("status").textContent = "请先完成所有项目，空格不算有效填写。"; return; } const results = evaluate(values); renderResults(results); $("status").textContent = "本次诊断已完成。"; $("submitBtn").textContent = "再次提交 · 更新诊断"; });
+    ids.forEach(id => { $(id).addEventListener("input", function() { if (!$("result").hidden) { $("result").hidden = true; $("status").textContent = "答案已修改，请重新提交以更新诊断。"; } }); });
+    $("editBtn").addEventListener("click", function() { const firstReview = lastResults.findIndex(item => item.score < 100); const targetId = ids[firstReview === -1 ? 0 : firstReview]; scrollToElement($("answerForm")); $(targetId).focus({ preventScroll: true }); });
+  })();
 
-  function evaluate(text){
-    var len=text.length;var jp=88;var jpNotes=[];
-    var keigoHits=(text.match(/です|ます|ございます|いたします|申し上げます|おります|ではありません/g)||[]).length;
-    if(keigoHits>=2){jp+=10;jpNotes.push('<span class="good">✅ 敬体稳定，文体得体。</span>');}
-    else if(keigoHits>=1){jp+=5;jpNotes.push('<span class="good">✅ 使用了敬体。</span>');}
-    else{jp-=12;jpNotes.push('<span class="warn">⚠️ 敬体不足，建议统一为「です・ます」体。</span>');}
-    var casual=(text.match(/だ。|だ！|する。|した。|である。/g)||[]).length;
-    if(casual>0){jp-=12*casual;jpNotes.push('<span class="bad">❌ 混入常体，应统一为敬体。</span>');}
-    if(len<40){jp-=8;jpNotes.push('<span class="warn">⚠️ 句子太短，建议2～3句说明。</span>');}
-    else if(len>400){jp-=4;jpNotes.push('<span class="warn">⚠️ 篇幅偏长，注意可读性。</span>');}
-    jp=clamp(jp,60,100);
-    var jpSuggest='';if(jp>=95){jpSuggest='日语表达基本没有问题，无需修改。';}
-    else if(casual>0){jpSuggest='把常体统一为敬体。';}
-    else{jpSuggest='统一使用「です・ます」体。';}
+  // ==================== 页面3：口头应答逻辑 ====================
+  (function() {
+    const questions = ["A．このイベントはいつからですか。","B．このイベントはいつまでですか。","C．冒険ランク1でも参加できますか。","D．どんな報酬がもらえますか。","E．報酬はどうやって受け取りますか。","F．報酬メールの有効期限はどのくらいですか。"];
+    const $ = id => document.getElementById(id);
+    if(!$('recordBtn')) return;
+    const answers = questions.map(() => null); let index = 0; let mode = "real"; let recording = false; let busy = false; let recorder = null; let microphoneStream = null; let microphoneRequest = null; let clock = null; let startTime = 0; let leavingPage = false;
+    function formatTime(seconds) { const m = String(Math.floor(seconds / 60)).padStart(2, "0"); const s = String(seconds % 60).padStart(2, "0"); return m + ":" + s; }
+    function hasLiveMicrophone() { return microphoneStream && microphoneStream.getAudioTracks().some(track => track.readyState === "live"); }
+    function enableMicrophone(enabled) { if (!microphoneStream) return; microphoneStream.getAudioTracks().forEach(track => { track.enabled = enabled; }); }
+    async function getMicrophone() { if (hasLiveMicrophone()) return microphoneStream; if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) { throw new Error("unsupported"); } if (!microphoneRequest) { microphoneRequest = navigator.mediaDevices.getUserMedia({ audio: true }); } try { const acquired = await microphoneRequest; if (leavingPage) { acquired.getTracks().forEach(track => track.stop()); throw new Error("page-closed"); } microphoneStream = acquired; return microphoneStream; } finally { microphoneRequest = null; } }
+    function updateControls() { $("previous").disabled = recording || busy || index === 0; $("next").disabled = recording || busy; $("realMode").disabled = recording || busy; $("demoMode").disabled = recording || busy; $("recordBtn").disabled = busy; $("recordBtn").classList.toggle("recording", recording); $("waves").classList.toggle("active", recording); $("recordLabel").textContent = recording ? "停止录音" : mode === "demo" ? "开始模拟录音" : "点击开始录音"; $("modeBadge").textContent = mode === "real" ? "麦克风录音" : "模拟录音"; $("realMode").setAttribute("aria-pressed", String(mode === "real")); $("demoMode").setAttribute("aria-pressed", String(mode === "demo")); }
+    function showQuestion() { $("playback").pause(); $("playback").removeAttribute("src"); $("playback").load(); $("playback").hidden = true; $("question").textContent = questions[index]; $("step").textContent = `第${index + 1}题 / 共6题`; $("progressBar").style.width = ((index + 1) / questions.length * 100) + "%"; $("next").textContent = index === questions.length - 1 ? "完成本轮" : "下一题"; const answer = answers[index]; $("timer").textContent = formatTime(answer ? answer.seconds : 0); if (answer && answer.url) { $("playback").src = answer.url; $("playback").hidden = false; $("status").textContent = "录音已完成，可回放或重新录制。"; } else if (answer && answer.demo) { $("status").textContent = "模拟录音已结束。"; } else { $("status").textContent = ""; } updateControls(); }
+    function beginTimer() { clearInterval(clock); startTime = Date.now(); $("timer").textContent = "00:00"; clock = setInterval(() => { $("timer").textContent = formatTime(Math.floor((Date.now() - startTime) / 1000)); }, 250); }
+    function saveAnswer(questionIndex, answer) { const oldAnswer = answers[questionIndex]; if (oldAnswer && oldAnswer.url) { URL.revokeObjectURL(oldAnswer.url); } answers[questionIndex] = answer; }
+    async function startRecording() { $("playback").pause(); if (mode === "demo") { recording = true; beginTimer(); $("playback").hidden = true; $("status").textContent = "模拟录音中……"; updateControls(); return; } busy = true; updateControls(); $("status").textContent = hasLiveMicrophone() ? "" : "正在连接麦克风……"; try { const stream = await getMicrophone(); enableMicrophone(true); const currentRecorder = new MediaRecorder(stream); const questionIndex = index; const chunks = []; let failed = false; let stoppedAt = null; recorder = currentRecorder; currentRecorder.addEventListener("dataavailable", event => { if (event.data.size > 0) chunks.push(event.data); }); currentRecorder.addEventListener("error", () => { failed = true; clearInterval(clock); recording = false; busy = false; enableMicrophone(false); $("status").textContent = "录音发生异常，请重新尝试。"; updateControls(); }); currentRecorder.addEventListener("stop", () => { clearInterval(clock); recording = false; busy = false; enableMicrophone(false); if (leavingPage) return; const seconds = Math.max(0, Math.floor(((stoppedAt || Date.now()) - startTime) / 1000)); if (!failed && chunks.length) { const blob = new Blob(chunks, { type: currentRecorder.mimeType || chunks[0].type }); saveAnswer(questionIndex, { url: URL.createObjectURL(blob), seconds, demo: false }); showQuestion(); } else { $("status").textContent = "未获得有效录音，请重新尝试。"; updateControls(); } recorder = null; }); currentRecorder.markStopTime = () => { stoppedAt = Date.now(); }; currentRecorder.start(); recording = true; busy = false; beginTimer(); $("playback").hidden = true; $("status").textContent = "正在录音……"; updateControls(); } catch (error) { enableMicrophone(false); recording = false; busy = false; recorder = null; if (leavingPage) return; $("settings").open = true; $("status").textContent = "麦克风不可用，请检查权限，或选择模拟录音。"; updateControls(); } }
+    function stopRecording() { clearInterval(clock); if (mode === "demo") { saveAnswer(index, { demo: true, seconds: Math.floor((Date.now() - startTime) / 1000), url: null }); recording = false; showQuestion(); return; } if (recorder && recorder.state !== "inactive") { busy = true; updateControls(); $("status").textContent = "正在保存录音……"; recorder.markStopTime(); recorder.stop(); enableMicrophone(false); } }
+    $("recordBtn").addEventListener("click", () => { if (busy) return; if (recording) stopRecording(); else startRecording(); });
+    $("previous").addEventListener("click", () => { if (recording || busy || index === 0) return; index--; showQuestion(); });
+    $("next").addEventListener("click", () => { if (recording || busy) return; if (index < questions.length - 1) { index++; showQuestion(); } else { $("playback").pause(); $("practice").hidden = true; $("finished").hidden = false; $("step").textContent = "本轮结束"; const realCount = answers.filter(a => a && a.url).length; const demoCount = answers.filter(a => a && a.demo).length; $("completionText").textContent = `共6道咨询题，已录制${realCount}题，模拟操作${demoCount}题。`; } });
+    $("restart").addEventListener("click", () => { index = 0; $("practice").hidden = false; $("finished").hidden = true; showQuestion(); });
+    function setMode(nextMode) { if (recording || busy) return; mode = nextMode; enableMicrophone(false); $("status").textContent = ""; updateControls(); }
+    $("realMode").addEventListener("click", () => { setMode("real"); });
+    $("demoMode").addEventListener("click", () => { setMode("demo"); });
+    window.addEventListener("pagehide", () => { leavingPage = true; clearInterval(clock); if (recorder && recorder.state !== "inactive") { recorder.stop(); } if (microphoneStream) { microphoneStream.getTracks().forEach(track => track.stop()); microphoneStream = null; } });
+    window.addEventListener("pageshow", event => { leavingPage = false; if (event.persisted) { recording = false; busy = false; recorder = null; showQuestion(); } });
+    showQuestion();
+  })();
 
-    var clarify=40;var clarifyNotes=[];
-    if(/京劇|中国の伝統|中国伝統|戯曲|伝統演劇/.test(text)){clarify+=25;clarifyNotes.push('<span class="good">✅ 正确指出中国京剧・传统戏剧。</span>');}
-    else{clarifyNotes.push('<span class="bad">❌ 未明示文化来源，应写「中国の伝統演劇、特に京劇」。</span>');}
-    var harsh=(text.match(/違います|間違|ではありません|じゃない/g)||[]).length;
-    var soft=/確かに|おっしゃる通り|ご指摘|なるほど|実は/.test(text);
-    if(harsh>=1&&!soft){clarify-=10;clarifyNotes.push('<span class="warn">⚠️ 直接否定太生硬，应先认同再纠正。</span>');}
-    else if(harsh>=1&&soft){clarifyNotes.push('<span class="good">✅ 否定时也尊重了对方观点。</span>');}
-    else if(!harsh){clarify+=15;clarifyNotes.push('<span class="good">✅ 未使用生硬否定，表达温和。</span>');}
-    if(/ではありません|です|ます/.test(text)){clarify+=15;clarifyNotes.push('<span class="good">✅ 用敬体礼貌传达。</span>');}
-    clarify=clamp(clarify,20,100);
-    var clarifySuggest='';if(clarify>=90){clarifySuggest='来源说明与语气都没有问题。';}
-    else if(harsh>=1&&!soft){clarifySuggest='把「それは違います」换成「実は〜なんです」。';}
-    else{clarifySuggest='明确写出「中国の伝統演劇、特に京劇」。';}
-
-    var receive=25;var receiveNotes=[];
-    if(/歌舞伎/.test(text)){receive+=20;receiveNotes.push('<span class="good">✅ 提到了玩家说的「歌舞伎」。</span>');}
-    else{receiveNotes.push('<span class="bad">❌ 未回应玩家「像歌舞伎」的观察。</span>');}
-    if(/似|共通|近い|思われる|感じ/.test(text)){receive+=15;receiveNotes.push('<span class="good">✅ 触及了相似点。</span>');}
-    else{receiveNotes.push('<span class="warn">⚠️ 应先说「確かに似ている部分もあります」。</span>');}
-    if(/確かに|おっしゃる通り|ご指摘|なるほど/.test(text)){receive+=25;receiveNotes.push('<span class="good">✅ 有「確かに」等认同表达。</span>');}
-    else{receiveNotes.push('<span class="bad">❌ 缺少「確かに」等先认同的表达。</span>');}
-    receive=clamp(receive,10,100);
-    var receiveSuggest='';if(receive>=80){receiveSuggest='能好好接住玩家的观察。';}
-    else{receiveSuggest='开头加一句「確かに歌舞伎と似ている部分もありますね」。';}
-
-    var encourage=25;var encourageNotes=[];
-    if(/ぜひ|お気軽|いつでも|質問|聞かせて|教えて|楽しんで/.test(text)){encourage+=30;encourageNotes.push('<span class="good">✅ 有邀请继续对话的表达。</span>');}
-    else{encourageNotes.push('<span class="bad">❌ 缺少「ぜひお気軽にご質問ください」等邀请。</span>');}
-    if(/ありがとう|感謝|うれしい|嬉しい/.test(text)){encourage+=20;encourageNotes.push('<span class="good">✅ 表达了感谢。</span>');}
-    else{encourageNotes.push('<span class="warn">⚠️ 加一句「ご関心ありがとうございます」。</span>');}
-    if(/応援|一緒に|これからも|よろしく/.test(text)){encourage+=15;encourageNotes.push('<span class="good">✅ 有面向未来的表达。</span>');}
-    else{encourageNotes.push('<span class="warn">⚠️ 加一句「これからも〜を楽しんでください」。</span>');}
-    encourage=clamp(encourage,10,100);
-    var encourageSuggest='';if(encourage>=80){encourageSuggest='有继续对话的姿态。';}
-    else{encourageSuggest='结尾加「ぜひお気軽にご質問ください」。';}
-
-    var scores=[jp,clarify,receive,encourage];var min=Math.min.apply(null,scores);var level;
-    if(min>=75){level='green';}else if(min>=25){level='yellow';}else{level='red';}
-
-    var fav=Math.round(receive*0.35+encourage*0.30+clarify*0.25+jp*0.10);fav=clamp(fav,0,100);
-    var favLevel,favNote;
-    if(fav>=75){favLevel='green';favNote='<span class="em">玩家抱有好感。</span>请继续保持这种温和、有回应的沟通方式。';}
-    else if(fav>=50){favLevel='yellow';favNote='<span class="em">玩家略感不满。</span>日语虽然准确，但缺少「承接玩家观察」和「邀请继续交流」两句话，好感度会被拉低。';}
-    else{favLevel='red';favNote='<span class="em">玩家容易产生不满。</span>仅有正确日语不够，先认同玩家的观察，再在结尾邀请继续交流，好感度才会上升。';}
-
-    return {
-      dims:[
-        {score:jp,notes:jpNotes,suggest:jpSuggest},
-        {score:clarify,notes:clarifyNotes,suggest:clarifySuggest},
-        {score:receive,notes:receiveNotes,suggest:receiveSuggest},
-        {score:encourage,notes:encourageNotes,suggest:encourageSuggest}
-      ],
-      level:level,fav:fav,favLevel:favLevel,favNote:favNote
-    };
-  }
-
-  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
-
-  function render(ev){
-    for(var i=0;i<4;i++){
-      var d=ev.dims[i];
-      var scoreEl=document.getElementById('score'+i);
-      var barEl=document.getElementById('bar'+i);
-      var fbEl=document.getElementById('fb'+i);
-      scoreEl.textContent=d.score;
-      scoreEl.className='dim-score'+(d.score<40?' critical':d.score<70?' low':'');
-      barEl.className=d.score<40?'critical':d.score<70?'low':'';
-      (function(el,sc){setTimeout(function(){el.style.width=sc+'%';},60);})(barEl,d.score);
-      var html='';d.notes.forEach(function(n){html+=n+'<br>';});
-      html+='<span style="color:#8a6d2f;margin-top:6px;display:inline-block;">建议：'+d.suggest+'</span>';
-      fbEl.innerHTML=html;
-    }
-    var favValEl=document.getElementById('favValue');
-    var favBarEl=document.getElementById('favBar');
-    var favNoteEl=document.getElementById('favNote');
-    favValEl.textContent=ev.fav+'%';
-    favValEl.className='fav-value '+ev.favLevel;
-    favBarEl.className=ev.favLevel;
-    (function(el,sc){setTimeout(function(){el.style.width=sc+'%';},120);})(favBarEl,ev.fav);
-    favNoteEl.innerHTML=ev.favNote;
-
-    document.getElementById('decRed').classList.remove('active');
-    document.getElementById('decYellow').classList.remove('active');
-    document.getElementById('decGreen').classList.remove('active');
-    if(ev.level==='red')document.getElementById('decRed').classList.add('active');
-    if(ev.level==='yellow')document.getElementById('decYellow').classList.add('active');
-    if(ev.level==='green')document.getElementById('decGreen').classList.add('active');
-  }
-</script>
-</body>
-</html>
+  // ==================== 页面4：Bug报告逻辑 ====================
+  (function() {
+    const pairs=[["点击","クリックする"],["轻触","タップする"],["滑动","スワイプする"],["拖动","ドラッグする"],["输入","入力する"],["启动","起動する"],["滚动","スクロールする"],["放大","拡大する"]];
+    let selectedCN=null, selectedJP=null, connections=[]; let choice3Value=null;
+    if(!document.getElementById('matchArea')) return;
+    window.showScreen = function(id){ document.querySelectorAll('#app-bug .screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id==='student1') initMatch(); if(id==='analysis2') initStudents(); window.scrollTo(0,0); };
+    function toast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1400); }
+    function initMatch(){ selectedCN=null;selectedJP=null;connections=[]; const cn=document.getElementById('cnCol'),jp=document.getElementById('jpCol'); cn.innerHTML='';jp.innerHTML=''; const shuffled=[...pairs].sort(()=>Math.random()-.5); pairs.forEach((p,i)=>{ const b=document.createElement('button');b.className='match-item';b.textContent=p[0];b.dataset.value=p[0]; b.onclick=()=>selectMatch(b,'cn');cn.appendChild(b); }); shuffled.forEach(p=>{ const b=document.createElement('button');b.className='match-item';b.textContent=p[1];b.dataset.value=p[1]; b.onclick=()=>selectMatch(b,'jp');jp.appendChild(b); }); setTimeout(drawLines,50); }
+    function selectMatch(btn,type){ if(btn.classList.contains('matched'))return; if(type==='cn'){ document.querySelectorAll('#app-bug #cnCol .match-item').forEach(x=>x.classList.remove('selected')); selectedCN=btn;btn.classList.add('selected'); }else{ document.querySelectorAll('#app-bug #jpCol .match-item').forEach(x=>x.classList.remove('selected')); selectedJP=btn;btn.classList.add('selected'); } if(selectedCN&&selectedJP){ connections.push([selectedCN.dataset.value,selectedJP.dataset.value,selectedCN,selectedJP]); selectedCN.classList.add('matched
